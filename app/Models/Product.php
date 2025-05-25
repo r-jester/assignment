@@ -8,15 +8,24 @@ use Illuminate\Database\Eloquent\Model;
 class Product extends Model
 {
     use HasFactory;
+    protected $with = ["category", "tenant", "business"];
 
     protected $fillable = [
-        'tenant_id', 'business_id', 'category_id', 'name', 'description',
-        'price', 'stock_quantity', 'sku', 'barcode', 'image'
+        "tenant_id",
+        "business_id",
+        "category_id",
+        "name",
+        "description",
+        "price",
+        "stock_quantity",
+        "sku",
+        "barcode",
+        "image",
     ];
 
     public function tenant()
     {
-        return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
+        return $this->belongsTo(Tenant::class)->withDefault(["name" => "None"]);
     }
 
     public function business()

@@ -10,6 +10,18 @@ class ProductApi extends Controller
 {
     public function search($query): JsonResponse
     {
-        return response()->json(Product::where("name", "like", $query)->get());
+        return response()->json(
+            Product::where("name", "like", "%$query%")->paginate(10)
+        );
+    }
+    public function filter($query): JsonResponse
+    {
+        return response()->json(
+            Product::whereHas("category", function ($q) use ($query) {
+                $q->where("name", $query);
+            })
+                ->with("category")
+                ->get()
+        );
     }
 }

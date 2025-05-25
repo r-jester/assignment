@@ -10,6 +10,7 @@ use App\Http\Controllers\Api\ProductApi;
 // })->middleware('auth:sanctum');
 
 Route::get("/product/search/{request}", [ProductApi::class, "search"]);
+Route::get("/product/filter/{category}", [ProductApi::class, "filter"]);
 Route::get("/users", [UserController::class, "index"]);
 Route::post("/users/create", [UserController::class, "create"]);
 Route::put("/users/edit/{id}", [UserController::class, "edit"]);

@@ -189,4 +189,33 @@ class InventorySummaryController extends Controller
             return redirect()->back()->with('error', $e->getMessage())->withInput();
         }
     }
+
+    public function destroy(InventorySummary $inventorySummary)
+    {
+        // if (!auth()->user()->hasPermissionTo('delete-inventory-summaries')) {
+        //     throw UnauthorizedException::forPermissions(['delete-inventory-summaries']);
+        // }
+
+        DB::beginTransaction();
+        try {
+            $product = Product::find($inventorySummary->product_id);
+            if ($product) {
+                // Subtract the InventorySummary stock from Product stock
+                $newStockQuantity = $product->stock_quantity - $inventorySummary->stock_quantity;
+                if ($newStockQuantity < 0) {
+                    throw new \Exception("Cannot delete inventory summary as it would result in negative stock for product {$product->name}.");
+                }
+                $product->update(['stock_quantity' => $newStockQuantity]);
+            }
+
+            // Delete the InventorySummary (related InventoryAdjustments are deleted via cascade)
+            $inventorySummary->delete();
+
+            DB::commit();
+            return redirect()->route('inventory_summaries.index')->with('success', 'Inventory summary deleted successfully, and product stock updated.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->back()->with('error', 'Failed to delete inventory summary: ' . $e->getMessage());
+        }
+    }
 }

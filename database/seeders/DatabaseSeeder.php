@@ -2,18 +2,17 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use App\Models\Tenant;
-use App\Models\Business;
-use App\Models\Employee;
-use App\Models\Position;
-use App\Models\Department;
-use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as SpatieRole;
+use App\Models\Position;
+use App\Models\Department;
+use App\Models\Role;
+use App\Models\Employee;
+use App\Models\Tenant;
+use App\Models\Business;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 
 class DatabaseSeeder extends Seeder
 {
@@ -133,22 +132,23 @@ class DatabaseSeeder extends Seeder
         );
 
         $employee = Employee::firstOrCreate(
+            ['email' => 'superjester@fake.com'],
             [
-                // 'tenant_id' => 1,
-                // 'business_id' => 1,
-                'department_id' => 1,
-                'position_id' => 1,
-                'role_id' => 5,
+                'tenant_id' => $tenant->id,
+                'business_id' => $business->id,
+                'department_id' => $department->id,
+                'position_id' => $position->id,
+                'role_id' => $role->id,
+                'name' => 'Super Jester',
+                'phone' => '1234567890',
                 'username' => 'jester',
-                'password' => Hash::make('Jester'),
+                'password' => bcrypt('Jester'),
                 'first_name' => 'Super',
                 'last_name' => 'Jester',
-                'email' => 'superjester@fake.com',
-                'phone' => '1234567890',
                 'hire_date' => now(),
                 'salary' => 100000,
                 'status' => 'active',
-                'image' => 'uploads/employees/default.jpg'
+                'image' => 'uploads/employees/default.jpg',
             ]
         );
 

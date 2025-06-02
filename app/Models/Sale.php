@@ -10,15 +10,8 @@ class Sale extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 
-        'business_id', 
-        'location_id', 
-        'customer_id', 
-        'user_id',
-        'invoice_number', // Add this
-        'total_amount', 
-        'tax_amount', 
-        'status'
+        'tenant_id', 'business_id', 'location_id', 'customer_id', 'user_id',
+        'total_amount', 'tax_amount', 'status'
     ];
 
     protected $casts = [

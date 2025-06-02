@@ -10,9 +10,9 @@ class CreatePurchasesTable extends Migration
     {
         Schema::create('purchases', function (Blueprint $table) {
             $table->bigIncrements('id');
-            // $table->unsignedBigInteger('tenant_id');
-            // $table->unsignedBigInteger('business_id');
-            // $table->unsignedBigInteger('location_id');
+            $table->unsignedBigInteger('tenant_id');
+            $table->unsignedBigInteger('business_id');
+            $table->unsignedBigInteger('location_id');
             $table->unsignedBigInteger('supplier_id');
             $table->unsignedBigInteger('user_id');
             $table->decimal('total_amount', 15, 2);
@@ -20,9 +20,9 @@ class CreatePurchasesTable extends Migration
             $table->enum('status', ['completed', 'pending', 'cancelled'])->default('pending');
             $table->timestamps();
 
-            // $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
-            // $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
-            // $table->foreign('location_id')->references('id')->on('business_locations')->onDelete('restrict');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
+            $table->foreign('location_id')->references('id')->on('business_locations')->onDelete('restrict');
             $table->foreign('supplier_id')->references('id')->on('suppliers')->onDelete('restrict');
             $table->foreign('user_id')->references('id')->on('employees')->onDelete('restrict');
         });

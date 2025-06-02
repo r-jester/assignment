@@ -48,7 +48,7 @@ class SaleController extends Controller
         if (!auth()->user()->hasPermissionTo('create-sales')) {
             throw UnauthorizedException::forPermissions(['create-sales']);
         }
-    
+
         $validated = $request->validate([
             'tenant_id' => 'required|exists:tenants,id',
             'business_id' => 'required|exists:businesses,id',
@@ -61,55 +61,46 @@ class SaleController extends Controller
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.tax_rate_id' => 'nullable|exists:tax_rates,id',
         ]);
-    
+
         $totalAmount = 0;
-        $taxAmount = 0;
-        
         foreach ($validated['items'] as $item) {
             $product = Product::find($item['product_id']);
             $quantity = $item['quantity'];
             $subtotal = $product->price * $quantity;
             $taxRate = isset($item['tax_rate_id']) ? TaxRate::find($item['tax_rate_id']) : null;
-            $itemTaxAmount = $taxRate ? ($subtotal * $taxRate->rate / 100) : 0;
-            $totalAmount += $subtotal + $itemTaxAmount;
-            $taxAmount += $itemTaxAmount;
+            $taxAmount = $taxRate ? ($subtotal * $taxRate->rate / 100) : 0;
+            $totalAmount += $subtotal + $taxAmount;
         }
-    
-        // Generate invoice number
-        $latestSale = Sale::latest()->first();
-        $invoiceNumber = 'INV-' . str_pad(($latestSale ? $latestSale->id + 1 : 1), 6, '0', STR_PAD_LEFT);
-    
+
         $sale = Sale::create([
             'tenant_id' => $validated['tenant_id'],
             'business_id' => $validated['business_id'],
             'location_id' => $validated['location_id'],
             'customer_id' => $validated['customer_id'],
             'user_id' => $validated['user_id'],
-            'invoice_number' => $invoiceNumber,
             'status' => $validated['status'],
             'total_amount' => $totalAmount,
-            'tax_amount' => $taxAmount,
         ]);
-    
+
         foreach ($validated['items'] as $item) {
             $product = Product::find($item['product_id']);
             $quantity = $item['quantity'];
             $unit_price = $product->price;
             $subtotal = $unit_price * $quantity;
             $taxRate = isset($item['tax_rate_id']) ? TaxRate::find($item['tax_rate_id']) : null;
-            $itemTaxAmount = $taxRate ? ($subtotal * $taxRate->rate / 100) : 0;
-    
+            $tax_amount = $taxRate ? ($subtotal * $taxRate->rate / 100) : 0;
+
             SaleItem::create([
                 'sale_id' => $sale->id,
                 'product_id' => $item['product_id'],
                 'quantity' => $quantity,
                 'unit_price' => $unit_price,
                 'subtotal' => $subtotal,
-                'tax_amount' => $itemTaxAmount,
+                'tax_amount' => $tax_amount,
                 'tax_rate_id' => $item['tax_rate_id'] ?? null,
             ]);
         }
-    
+
         return redirect()->route('sales.index')->with('success', 'Sale created successfully.');
     }
 

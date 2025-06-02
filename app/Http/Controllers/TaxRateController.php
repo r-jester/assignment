@@ -11,23 +11,22 @@ class TaxRateController extends Controller
 {
     public function index()
     {
-        // $taxRates = TaxRate::with(['tenant', 'business'])->paginate(10);
-        $taxRates = TaxRate::paginate(10);
+        $taxRates = TaxRate::with(['tenant', 'business'])->paginate(10);
         return view('tax_rates.index', compact('taxRates'));
     }
 
     public function create()
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
-        return view('tax_rates.create');
+        $tenants = Tenant::all();
+        $businesses = Business::all();
+        return view('tax_rates.create', compact('tenants', 'businesses'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'nullable|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
+            'tenant_id' => 'nullable|exists:tenants,id',
+            'business_id' => 'required|exists:businesses,id',
             'name' => 'required|string|max:255',
             'rate' => 'required|numeric|min:0|max:100',
         ]);
@@ -45,16 +44,16 @@ class TaxRateController extends Controller
 
     public function edit(TaxRate $taxRate)
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
-        return view('tax_rates.edit', compact('taxRate'));
+        $tenants = Tenant::all();
+        $businesses = Business::all();
+        return view('tax_rates.edit', compact('taxRate', 'tenants', 'businesses'));
     }
 
     public function update(Request $request, TaxRate $taxRate)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'nullable|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
+            'tenant_id' => 'nullable|exists:tenants,id',
+            'business_id' => 'required|exists:businesses,id',
             'name' => 'required|string|max:255',
             'rate' => 'required|numeric|min:0|max:100',
         ]);

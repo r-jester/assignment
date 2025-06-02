@@ -14,7 +14,7 @@ return new class extends Migration {
             $table->unsignedBigInteger('location_id');
             $table->unsignedBigInteger('customer_id')->nullable();
             $table->unsignedBigInteger('user_id');
-            $table->string('invoice_number')->unique(); // Add unique constraint
+            $table->string('invoice_number');
             $table->decimal('total_amount', 15, 2);
             $table->decimal('tax_amount', 15, 2)->default(0.00);
             $table->enum('status', ['completed', 'pending', 'cancelled'])->default('pending');

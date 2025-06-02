@@ -8,8 +8,8 @@
             <thead>
                 <tr>
                     <th class="py-2 px-4 border-b">Name</th>
-                    {{-- <th class="py-2 px-4 border-b">Tenant</th>
-                    <th class="py-2 px-4 border-b">Business</th> --}}
+                    <th class="py-2 px-4 border-b">Tenant</th>
+                    <th class="py-2 px-4 border-b">Business</th>
                     <th class="py-2 px-4 border-b">Rate (%)</th>
                     <th class="py-2 px-4 border-b">Actions</th>
                 </tr>
@@ -18,8 +18,8 @@
                 @foreach ($taxRates as $taxRate)
                     <tr>
                         <td class="py-2 px-4 border-b">{{ $taxRate->name }}</td>
-                        {{-- <td class="py-2 px-4 border-b">{{ $taxRate->tenant->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $taxRate->business->name }}</td> --}}
+                        <td class="py-2 px-4 border-b">{{ $taxRate->tenant->name }}</td>
+                        <td class="py-2 px-4 border-b">{{ $taxRate->business->name }}</td>
                         <td class="py-2 px-4 border-b">{{ $taxRate->rate }}</td>
                         <td class="py-2 px-4 border-b">
                             <a href="{{ route('tax_rates.show', $taxRate) }}" class="text-blue-500">View</a>

@@ -4,8 +4,8 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Category Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            {{-- <p><strong>Tenant:</strong> {{ $category->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $category->business->name }}</p> --}}
+            <p><strong>Tenant:</strong> {{ $category->tenant->name }}</p>
+            <p><strong>Business:</strong> {{ $category->business->name }}</p>
             <p><strong>Name:</strong> {{ $category->name }}</p>
             <p><strong>Description:</strong> {{ $category->description ?? 'N/A' }}</p>
             <div class="mt-4">

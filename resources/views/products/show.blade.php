@@ -4,8 +4,8 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Product Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            {{-- <p><strong>Tenant:</strong> {{ $product->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $product->business->name }}</p> --}}
+            <p><strong>Tenant:</strong> {{ $product->tenant->name }}</p>
+            <p><strong>Business:</strong> {{ $product->business->name }}</p>
             <p><strong>Category:</strong> {{ $product->category->name }}</p>
             <p><strong>Name:</strong> {{ $product->name }}</p>
             <p><strong>Description:</strong> {{ $product->description ?? 'N/A' }}</p>

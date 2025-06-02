@@ -7,8 +7,8 @@
         <p><strong>Phone:</strong> {{ $customer->phone ?? 'N/A' }}</p>
         <p><strong>Address:</strong> {{ $customer->address ?? 'N/A' }}</p>
         <p><strong>Status:</strong> {{ $customer->status }}</p>
-        {{-- <p><strong>Tenant:</strong> {{ $customer->tenant->name ?? 'N/A' }}</p>
-        <p><strong>Business:</strong> {{ $customer->business->name ?? 'N/A' }}</p> --}}
+        <p><strong>Tenant:</strong> {{ $customer->tenant->name ?? 'N/A' }}</p>
+        <p><strong>Business:</strong> {{ $customer->business->name ?? 'N/A' }}</p>
 
         <h3>Contacts</h3>
         @if ($customer->contacts->isEmpty())

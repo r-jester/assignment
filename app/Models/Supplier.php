@@ -10,18 +10,18 @@ class Supplier extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'email', 'phone', 'address'
+        'tenant_id', 'business_id', 'name', 'email', 'phone', 'address'
     ];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
-    // }
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
+    }
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 
     public function purchases()
     {

@@ -10,7 +10,7 @@ class Expense extends Model
     use HasFactory;
 
     protected $fillable = [
-        'user_id', 'category_id',
+        'tenant_id', 'business_id', 'location_id', 'user_id', 'category_id',
         'amount', 'description', 'expense_date'
     ];
 
@@ -18,20 +18,20 @@ class Expense extends Model
         'expense_date' => 'date',
     ];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class);
-    // }
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 
-    // public function location()
-    // {
-    //     return $this->belongsTo(BusinessLocation::class);
-    // }
+    public function location()
+    {
+        return $this->belongsTo(BusinessLocation::class);
+    }
 
     public function user()
     {

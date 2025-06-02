@@ -10,7 +10,7 @@ class Purchase extends Model
     use HasFactory;
 
     protected $fillable = [
-        'supplier_id', 'user_id',
+        'tenant_id', 'business_id', 'location_id', 'supplier_id', 'user_id',
         'total_amount', 'tax_amount', 'status'
     ];
 
@@ -18,20 +18,20 @@ class Purchase extends Model
         'status' => 'string',
     ];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class);
-    // }
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 
-    // public function location()
-    // {
-    //     return $this->belongsTo(BusinessLocation::class);
-    // }
+    public function location()
+    {
+        return $this->belongsTo(BusinessLocation::class);
+    }
 
     public function supplier()
     {

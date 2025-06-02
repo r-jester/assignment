@@ -6,7 +6,7 @@
         <form action="{{ route('customers.update', $customer) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            {{-- <div class="form-group">
+            <div class="form-group">
                 <label for="tenant_id">Tenant</label>
                 <select name="tenant_id" id="tenant_id" class="form-control @error('tenant_id') is-invalid @enderror">
                     <option value="">Select Tenant</option>
@@ -29,7 +29,7 @@
                 @error('business_id')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
-            </div> --}}
+            </div>
             <div class="form-group">
                 <label for="first_name">First Name</label>
                 <input type="text" name="first_name" id="first_name" class="form-control @error('first_name') is-invalid @enderror" value="{{ old('first_name', $customer->first_name) }}">

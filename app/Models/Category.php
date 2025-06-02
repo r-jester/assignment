@@ -9,17 +9,17 @@ class Category extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['tenant_id', 'business_id', 'name', 'description'];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class);
-    // }
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 
     public function products()
     {

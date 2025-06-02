@@ -11,6 +11,8 @@ class TaxRateSeeder extends Seeder
 {
     public function run()
     {
+        $tenant = Tenant::first(); // or create one
+        $business = Business::first(); // or create one
 
         $taxRates = [
             ['rate' => 5, 'name' => '5% Tax'],
@@ -20,8 +22,9 @@ class TaxRateSeeder extends Seeder
 
         foreach ($taxRates as $tax) {
             TaxRate::firstOrCreate(
-                ['rate' => $tax['rate']],
+                ['rate' => $tax['rate'], 'business_id' => $business->id],
                 [
+                    'tenant_id' => $tenant->id,
                     'name' => $tax['name'],
                 ]
             );

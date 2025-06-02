@@ -14,8 +14,8 @@
               <p><strong>Username:</strong> {{ $employee->username }}</p>
               <p><strong>Email:</strong> {{ $employee->email ?? '-' }}</p>
               <p><strong>Phone:</strong> {{ $employee->phone ?? '-' }}</p>
-              {{-- <p><strong>Tenant:</strong> {{ $employee->tenant ? $employee->tenant->name : '-' }}</p>
-              <p><strong>Business:</strong> {{ $employee->business ? $employee->business->name : '-' }}</p> --}}
+              <p><strong>Tenant:</strong> {{ $employee->tenant ? $employee->tenant->name : '-' }}</p>
+              <p><strong>Business:</strong> {{ $employee->business ? $employee->business->name : '-' }}</p>
               <p><strong>Department:</strong> {{ $employee->department ? $employee->department->name : '-' }}</p>
               <p><strong>Position:</strong> {{ $employee->position ? $employee->position->name : '-' }}</p>
               <p><strong>Role:</strong> {{ $employee->role ? $employee->role->name : '-' }}</p>

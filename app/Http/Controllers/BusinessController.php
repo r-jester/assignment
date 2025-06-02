@@ -3,28 +3,27 @@
 namespace App\Http\Controllers;
 
 use App\Models\Business;
-// use App\Models\Tenant;
+use App\Models\Tenant;
 use Illuminate\Http\Request;
 
 class BusinessController extends Controller
 {
     public function index()
     {
-        // $businesses = Business::with('tenant')->paginate(10);
-        $businesses = Business::paginate(10);
+        $businesses = Business::with('tenant')->paginate(10);
         return view('businesses.index', compact('businesses'));
     }
 
     public function create()
     {
-        // $tenants = Tenant::all();
-        return view('businesses.create');
+        $tenants = Tenant::all();
+        return view('businesses.create', compact('tenants'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
+            'tenant_id' => 'required|exists:tenants,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
@@ -36,20 +35,20 @@ class BusinessController extends Controller
 
     public function show(Business $business)
     {
-        // $business->load('tenant');
-        return view('businesses.show');
+        $business->load('tenant');
+        return view('businesses.show', compact('business'));
     }
 
     public function edit(Business $business)
     {
-        // $tenants = Tenant::all();
-        return view('businesses.edit', compact('business'));
+        $tenants = Tenant::all();
+        return view('businesses.edit', compact('business', 'tenants'));
     }
 
     public function update(Request $request, Business $business)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
+            'tenant_id' => 'required|exists:tenants,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);

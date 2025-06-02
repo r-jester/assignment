@@ -3,10 +3,14 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller; // Make sure this is included
 
 class ProfileController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('user-auth');
+    }
+
     public function edit()
     {
         $employee = auth()->user();
@@ -18,17 +22,17 @@ class ProfileController extends Controller
         $employee = auth()->user();
 
         $request->validate([
-            // 'name' => 'required|string|max:255',
+            'name' => 'required|string|max:255',
             'email' => 'required|email|unique:employees,email,' . $employee->id,
             'phone' => 'nullable|string|max:20',
         ]);
 
         $employee->update([
-            // 'name' => $request->name,
+            'name' => $request->name,
             'email' => $request->email,
             'phone' => $request->phone,
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Profile updated successfully. Looking good!');
+        return redirect()->route('profile.edit')->with('success', 'Profile updated successfully. Looking good!');
     }
 }

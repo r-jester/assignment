@@ -11,15 +11,13 @@
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            font-size: 20px;
+            font-size: 16px;
             display: inline-flex;
             align-items: center;
-            justify-content: center;
+            gap: 8px;
             transition: all 0.3s;
             color: white;
             margin: 5px;
-            width: 50px;
-            height: 50px;
         }
         
         .btn-success {
@@ -37,6 +35,15 @@
         .btn:hover {
             opacity: 0.9;
         }
+        
+        .qrcode-container {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .qrcode-container img {
+            max-width: 200px;
+        }
     </style>
 </head>
 <body>
@@ -44,9 +51,17 @@
 <h2>Attendance</h2>
 
 <input type="hidden" id="employee_id" value="{{ $employee_id }}">
-<button id="attendance-button" class="btn" onclick="toggleAttendance()">
-    <i class="fas fa-fingerprint"></i>
-</button>
+<button id="attendance-button" class="btn" onclick="toggleAttendance()">Loading...</button>
+
+<div id="qrcode-container" class="qrcode-container" style="{{ $isChecked ? 'display: none;' : 'display: block;' }}">
+    <h3>Scan to Check In</h3>
+    <div id="qrcode">
+        @if($qrCode)
+            <img src="{{ $qrCode }}" alt="QR Code" style="max-width: 200px;">
+        @endif
+    </div>
+    <button class="btn btn-primary" onclick="window.print()">Print QR Code</button>
+</div>
 
 <script>
     let isCheckedIn = {{ $isChecked ? 'true' : 'false' }};
@@ -56,8 +71,10 @@
         const button = document.getElementById('attendance-button');
         
         if (isCheckedIn) {
+            button.innerHTML = '<i class="fas fa-fingerprint"></i> Check Out';
             button.className = 'btn btn-danger';
         } else {
+            button.innerHTML = '<i class="fas fa-fingerprint"></i> Check In';
             button.className = 'btn btn-success';
         }
     }
@@ -82,6 +99,12 @@
                 alert(data.message);
                 isCheckedIn = !isCheckedIn;
                 updateButton();
+                // Hide QR code if checked in
+                if (isCheckedIn) {
+                    document.getElementById('qrcode-container').style.display = 'none';
+                } else {
+                    document.getElementById('qrcode-container').style.display = 'block';
+                }
             } else {
                 alert(data.error);
             }
@@ -89,7 +112,7 @@
         .catch(error => console.error("Error:", error));
     }
 
-    // Set initial button state
+    // Set initial button label
     updateButton();
 </script>
 

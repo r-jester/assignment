@@ -10,11 +10,12 @@ class CreateEmployeesTable extends Migration
         // First create the table structure without foreign keys
         Schema::create('employees', function (Blueprint $table) {
             $table->id();
-            // $table->unsignedBigInteger('tenant_id');
-            // $table->unsignedBigInteger('business_id');
+            $table->unsignedBigInteger('tenant_id');
+            $table->unsignedBigInteger('business_id');
             $table->unsignedBigInteger('department_id')->nullable();
             $table->unsignedBigInteger('position_id')->nullable();
             $table->unsignedBigInteger('role_id');
+            $table->string('name');
             $table->string('phone')->nullable();
             $table->string('username')->unique();
             $table->string('password');
@@ -30,8 +31,8 @@ class CreateEmployeesTable extends Migration
 
         // Then add foreign key constraints in a separate operation
         Schema::table('employees', function (Blueprint $table) {
-            // $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
-            // $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             $table->foreign('department_id')->references('id')->on('departments')->onDelete('set null');
             $table->foreign('position_id')->references('id')->on('positions')->onDelete('set null');
             $table->foreign('role_id')->references('id')->on('roles')->onDelete('cascade');
@@ -41,8 +42,8 @@ class CreateEmployeesTable extends Migration
     public function down()
     {
         Schema::table('employees', function (Blueprint $table) {
-            // $table->dropForeign(['tenant_id']);
-            // $table->dropForeign(['business_id']);
+            $table->dropForeign(['tenant_id']);
+            $table->dropForeign(['business_id']);
             $table->dropForeign(['department_id']);
             $table->dropForeign(['position_id']);
             $table->dropForeign(['role_id']);

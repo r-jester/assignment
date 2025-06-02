@@ -16,8 +16,8 @@
                     <th>Email</th>
                     <th>Phone</th>
                     <th>Status</th>
-                    {{-- <th>Tenant</th>
-                    <th>Business</th> --}}
+                    <th>Tenant</th>
+                    <th>Business</th>
                     <th>Actions</th>
                 </tr>
             </thead>
@@ -28,8 +28,8 @@
                         <td>{{ $customer->email ?? 'N/A' }}</td>
                         <td>{{ $customer->phone ?? 'N/A' }}</td>
                         <td>{{ $customer->status }}</td>
-                        {{-- <td>{{ $customer->tenant->name ?? 'N/A' }}</td>
-                        <td>{{ $customer->business->name ?? 'N/A' }}</td> --}}
+                        <td>{{ $customer->tenant->name ?? 'N/A' }}</td>
+                        <td>{{ $customer->business->name ?? 'N/A' }}</td>
                         <td>
                             @can('view-customers')
                                 <a href="{{ route('customers.show', $customer) }}" class="btn btn-info btn-sm">View</a>

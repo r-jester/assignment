@@ -20,8 +20,8 @@ class EmployeeFactory extends Factory
         $lastName = $this->faker->lastName;
         
         return [
-            // 'tenant_id' => Tenant::factory(),
-            // 'business_id' => Business::factory(),
+            'tenant_id' => Tenant::factory(),
+            'business_id' => Business::factory(),
             'department_id' => Department::factory(),
             'position_id' => Position::factory(),
             'role_id' => Role::factory(), // Add this line
@@ -29,6 +29,7 @@ class EmployeeFactory extends Factory
             'password' => bcrypt('password'),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
+            'name' => "$firstName $lastName", // ✅ Add this
             'email' => $this->faker->unique()->safeEmail,
             'hire_date' => $this->faker->date(),
             'salary' => $this->faker->numberBetween(30000, 100000),

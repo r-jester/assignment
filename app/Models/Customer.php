@@ -10,13 +10,23 @@ class Customer extends Model
     use HasFactory;
 
     protected $fillable = [
-        'first_name', 'last_name',
+        'tenant_id', 'business_id', 'first_name', 'last_name',
         'email', 'phone', 'address', 'status', 'image'
     ];
 
     protected $casts = [
         'status' => 'string',
     ];
+
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class);
+    }
+
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 
     public function leads()
     {

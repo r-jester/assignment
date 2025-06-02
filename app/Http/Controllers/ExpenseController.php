@@ -14,27 +14,26 @@ class ExpenseController extends Controller
 {
     public function index()
     {
-        // $expenses = Expense::with(['tenant', 'business', 'location', 'user', 'category'])->paginate(10);
-        $expenses = Expense::with(['user', 'category'])->paginate(10);
+        $expenses = Expense::with(['tenant', 'business', 'location', 'user', 'category'])->paginate(10);
         return view('expenses.index', compact('expenses'));
     }
 
     public function create()
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
-        // $locations = BusinessLocation::all();
+        $tenants = Tenant::all();
+        $businesses = Business::all();
+        $locations = BusinessLocation::all();
         $employees = Employee::all();
         $categories = Category::all();
-        return view('expenses.create', compact('employees', 'categories'));
+        return view('expenses.create', compact('tenants', 'businesses', 'locations', 'employees', 'categories'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
-            // 'location_id' => 'required|exists:business_locations,id',
+            'tenant_id' => 'required|exists:tenants,id',
+            'business_id' => 'required|exists:businesses,id',
+            'location_id' => 'required|exists:business_locations,id',
             'user_id' => 'required|exists:employees,id',
             'category_id' => 'required|exists:categories,id',
             'amount' => 'required|numeric|min:0',
@@ -49,26 +48,26 @@ class ExpenseController extends Controller
 
     public function show(Expense $expense)
     {
-        $expense->load(['user', 'category']);
+        $expense->load(['tenant', 'business', 'location', 'user', 'category']);
         return view('expenses.show', compact('expense'));
     }
 
     public function edit(Expense $expense)
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
-        // $locations = BusinessLocation::all();
+        $tenants = Tenant::all();
+        $businesses = Business::all();
+        $locations = BusinessLocation::all();
         $employees = Employee::all();
         $categories = Category::all();
-        return view('expenses.edit', compact('expense', 'employees', 'categories'));
+        return view('expenses.edit', compact('expense', 'tenants', 'businesses', 'locations', 'employees', 'categories'));
     }
 
     public function update(Request $request, Expense $expense)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
-            // 'location_id' => 'required|exists:business_locations,id',
+            'tenant_id' => 'required|exists:tenants,id',
+            'business_id' => 'required|exists:businesses,id',
+            'location_id' => 'required|exists:business_locations,id',
             'user_id' => 'required|exists:employees,id',
             'category_id' => 'required|exists:categories,id',
             'amount' => 'required|numeric|min:0',

@@ -9,8 +9,8 @@ return new class extends Migration {
     {
         Schema::create('products', function (Blueprint $table) {
             $table->id();
-            // $table->unsignedBigInteger('tenant_id')->nullable();
-            // $table->unsignedBigInteger('business_id');
+            $table->unsignedBigInteger('tenant_id')->nullable();
+            $table->unsignedBigInteger('business_id');
             $table->unsignedBigInteger('category_id');
             $table->string('name');
             $table->text('description')->nullable();
@@ -21,8 +21,8 @@ return new class extends Migration {
             $table->string('image')->nullable();
             $table->timestamps();
 
-            // $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('set null');
-            // $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('set null');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('restrict');
         });
     }

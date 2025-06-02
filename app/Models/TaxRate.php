@@ -10,16 +10,16 @@ class TaxRate extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name', 'rate'
+        'tenant_id', 'business_id', 'name', 'rate'
     ];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
-    // }
+    public function tenant()
+    {
+        return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
+    }
 
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
+    public function business()
+    {
+        return $this->belongsTo(Business::class);
+    }
 }

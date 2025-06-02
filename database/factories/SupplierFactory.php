@@ -14,8 +14,8 @@ class SupplierFactory extends Factory
     public function definition()
     {
         return [
-            // 'tenant_id' => $this->faker->boolean(50) ? Tenant::factory() : null,
-            // 'business_id' => Business::factory(),
+            'tenant_id' => $this->faker->boolean(50) ? Tenant::factory() : null,
+            'business_id' => Business::factory(),
             'name' => $this->faker->company,
             'email' => $this->faker->unique()->companyEmail,
             'phone' => $this->faker->phoneNumber,

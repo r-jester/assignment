@@ -8,8 +8,8 @@
             <thead>
                 <tr>
                     <th class="py-2 px-4 border-b">Name</th>
-                    {{-- <th class="py-2 px-4 border-b">Tenant</th>
-                    <th class="py-2 px-4 border-b">Business</th> --}}
+                    <th class="py-2 px-4 border-b">Tenant</th>
+                    <th class="py-2 px-4 border-b">Business</th>
                     <th class="py-2 px-4 border-b">Email</th>
                     <th class="py-2 px-4 border-b">Phone</th>
                     <th class="py-2 px-4 border-b">Actions</th>
@@ -19,8 +19,8 @@
                 @foreach ($suppliers as $supplier)
                     <tr>
                         <td class="py-2 px-4 border-b">{{ $supplier->name }}</td>
-                        {{-- <td class="py-2 px-4 border-b">{{ $supplier->tenant->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $supplier->business->name }}</td> --}}
+                        <td class="py-2 px-4 border-b">{{ $supplier->tenant->name }}</td>
+                        <td class="py-2 px-4 border-b">{{ $supplier->business->name }}</td>
                         <td class="py-2 px-4 border-b">{{ $supplier->email ?? 'N/A' }}</td>
                         <td class="py-2 px-4 border-b">{{ $supplier->phone ?? 'N/A' }}</td>
                         <td class="py-2 px-4 border-b">

@@ -17,29 +17,28 @@ class PurchaseController extends Controller
 {
     public function index()
     {
-        // $purchases = Purchase::with(['tenant', 'business', 'location', 'supplier', 'user'])->paginate(10);
-        $purchases = Purchase::with(['supplier', 'user'])->paginate(10);
+        $purchases = Purchase::with(['tenant', 'business', 'location', 'supplier', 'user'])->paginate(10);
         return view('purchases.index', compact('purchases'));
     }
 
     public function create()
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
-        // $locations = BusinessLocation::all();
+        $tenants = Tenant::all();
+        $businesses = Business::all();
+        $locations = BusinessLocation::all();
         $suppliers = Supplier::all();
         $employees = Employee::all();
         $products = Product::all();
         $taxRates = TaxRate::whereNull('end_date')->orWhere('end_date', '>=', now())->get();
-        return view('purchases.create', compact('suppliers', 'employees', 'products', 'taxRates'));
+        return view('purchases.create', compact('tenants', 'businesses', 'locations', 'suppliers', 'employees', 'products', 'taxRates'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
-            // 'location_id' => 'required|exists:business_locations,id',
+            'tenant_id' => 'required|exists:tenants,id',
+            'business_id' => 'required|exists:businesses,id',
+            'location_id' => 'required|exists:business_locations,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
@@ -54,9 +53,9 @@ class PurchaseController extends Controller
         $taxAmount = 0;
 
         $purchase = Purchase::create([
-            // 'tenant_id' => $validated['tenant_id'],
-            // 'business_id' => $validated['business_id'],
-            // 'location_id' => $validated['location_id'],
+            'tenant_id' => $validated['tenant_id'],
+            'business_id' => $validated['business_id'],
+            'location_id' => $validated['location_id'],
             'supplier_id' => $validated['supplier_id'],
             'user_id' => $validated['user_id'],
             'status' => $validated['status'],
@@ -102,30 +101,29 @@ class PurchaseController extends Controller
 
     public function show(Purchase $purchase)
     {
-        // $purchase->load(['tenant', 'business', 'location', 'supplier', 'user', 'purchaseItems.product']);
-        $purchase->load(['supplier', 'user', 'purchaseItems.product']);
+        $purchase->load(['tenant', 'business', 'location', 'supplier', 'user', 'purchaseItems.product']);
         return view('purchases.show', compact('purchase'));
     }
 
     public function edit(Purchase $purchase)
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
-        // $locations = BusinessLocation::all();
+        $tenants = Tenant::all();
+        $businesses = Business::all();
+        $locations = BusinessLocation::all();
         $suppliers = Supplier::all();
         $employees = Employee::all();
         $products = Product::all();
         $taxRates = TaxRate::whereNull('end_date')->orWhere('end_date', '>=', now())->get();
         $purchase->load('purchaseItems');
-        return view('purchases.edit', compact('purchase', 'suppliers', 'employees', 'products', 'taxRates'));
+        return view('purchases.edit', compact('purchase', 'tenants', 'businesses', 'locations', 'suppliers', 'employees', 'products', 'taxRates'));
     }
 
     public function update(Request $request, Purchase $purchase)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
-            // 'location_id' => 'required|exists:business_locations,id',
+            'tenant_id' => 'required|exists:tenants,id',
+            'business_id' => 'required|exists:businesses,id',
+            'location_id' => 'required|exists:business_locations,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
@@ -175,9 +173,9 @@ class PurchaseController extends Controller
         }
 
         $purchase->update([
-            // 'tenant_id' => $validated['tenant_id'],
-            // 'business_id' => $validated['business_id'],
-            // 'location_id' => $validated['location_id'],
+            'tenant_id' => $validated['tenant_id'],
+            'business_id' => $validated['business_id'],
+            'location_id' => $validated['location_id'],
             'supplier_id' => $validated['supplier_id'],
             'user_id' => $validated['user_id'],
             'status' => $validated['status'],

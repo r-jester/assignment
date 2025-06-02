@@ -17,9 +17,9 @@ class ExpenseFactory extends Factory
     public function definition()
     {
         return [
-            // 'tenant_id' => Tenant::factory(),
-            // 'business_id' => Business::factory(),
-            // 'location_id' => BusinessLocation::factory(),
+            'tenant_id' => Tenant::factory(),
+            'business_id' => Business::factory(),
+            'location_id' => BusinessLocation::factory(),
             'user_id' => Employee::factory(),
             'category_id' => Category::factory(),
             'amount' => $this->faker->randomFloat(2, 10, 1000),

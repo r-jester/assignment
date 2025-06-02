@@ -10,9 +10,9 @@ class CreateExpensesTable extends Migration
     {
         Schema::create('expenses', function (Blueprint $table) {
             $table->bigIncrements('id');
-            // $table->unsignedBigInteger('tenant_id');
-            // $table->unsignedBigInteger('business_id');
-            // $table->unsignedBigInteger('location_id');
+            $table->unsignedBigInteger('tenant_id');
+            $table->unsignedBigInteger('business_id');
+            $table->unsignedBigInteger('location_id');
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('category_id');
             $table->decimal('amount', 15, 2);
@@ -20,9 +20,9 @@ class CreateExpensesTable extends Migration
             $table->date('expense_date');
             $table->timestamps();
 
-            // $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
-            // $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
-            // $table->foreign('location_id')->references('id')->on('business_locations')->onDelete('restrict');
+            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
+            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
+            $table->foreign('location_id')->references('id')->on('business_locations')->onDelete('restrict');
             $table->foreign('user_id')->references('id')->on('employees')->onDelete('restrict');
             $table->foreign('category_id')->references('id')->on('categories')->onDelete('restrict');
         });

@@ -6,7 +6,7 @@
         <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            {{-- <div class="mb-4">
+            <div class="mb-4">
                 <label class="block text-sm font-medium">Tenant</label>
                 <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
                     <option value="" {{ is_null($product->tenant_id) ? 'selected' : '' }}>None</option>
@@ -24,7 +24,7 @@
                     @endforeach
                 </select>
                 @error('business_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div> --}}
+            </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Category</label>
                 <select name="category_id" class="mt-1 block w-full border rounded p-2">

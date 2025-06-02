@@ -14,8 +14,8 @@ class CustomerFactory extends Factory
     public function definition()
     {
         return [
-            // 'tenant_id' => Tenant::factory(),
-            // 'business_id' => Business::factory(),
+            'tenant_id' => Tenant::factory(),
+            'business_id' => Business::factory(),
             'first_name' => $this->faker->firstName,
             'last_name' => $this->faker->lastName,
             'email' => $this->faker->unique()->safeEmail,

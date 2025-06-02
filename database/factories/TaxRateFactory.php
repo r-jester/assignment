@@ -14,8 +14,8 @@ class TaxRateFactory extends Factory
     public function definition()
     {
         return [
-            // 'tenant_id' => $this->faker->boolean(50) ? Tenant::factory() : null,
-            // 'business_id' => Business::factory(),
+            'tenant_id' => $this->faker->boolean(50) ? Tenant::factory() : null,
+            'business_id' => Business::factory(),
             'name' => $this->faker->word . ' Tax',
             'rate' => $this->faker->randomFloat(2, 0, 20),
         ];

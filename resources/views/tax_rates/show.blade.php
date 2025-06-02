@@ -4,8 +4,8 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Tax Rate Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            {{-- <p><strong>Tenant:</strong> {{ $taxRate->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $taxRate->business->name }}</p> --}}
+            <p><strong>Tenant:</strong> {{ $taxRate->tenant->name }}</p>
+            <p><strong>Business:</strong> {{ $taxRate->business->name }}</p>
             <p><strong>Name:</strong> {{ $taxRate->name }}</p>
             <p><strong>Rate (%):</strong> {{ $taxRate->rate }}</p>
             <div class="mt-4">

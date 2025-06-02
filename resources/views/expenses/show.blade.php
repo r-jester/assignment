@@ -4,9 +4,9 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Expense Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            {{-- <p><strong>Tenant:</strong> {{ $expense->tenant->name }}</p>
+            <p><strong>Tenant:</strong> {{ $expense->tenant->name }}</p>
             <p><strong>Business:</strong> {{ $expense->business->name }}</p>
-            <p><strong>Location:</strong> {{ $expense->location->name }}</p> --}}
+            <p><strong>Location:</strong> {{ $expense->location->name }}</p>
             <p><strong>Employee:</strong> {{ $expense->user->first_name }} {{ $expense->user->last_name }}</p>
             <p><strong>Category:</strong> {{ $expense->category->name }}</p>
             <p><strong>Amount:</strong> {{ $expense->amount }}</p>

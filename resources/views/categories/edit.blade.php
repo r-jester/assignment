@@ -6,7 +6,7 @@
         <form action="{{ route('categories.update', $category) }}" method="POST">
             @csrf
             @method('PUT')
-            {{-- <div class="mb-4">
+            <div class="mb-4">
                 <label class="block text-sm font-medium">Tenant</label>
                 <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
                     @foreach ($tenants as $tenant)
@@ -23,7 +23,7 @@
                     @endforeach
                 </select>
                 @error('business_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div> --}}
+            </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Name</label>
                 <input type="text" name="name" class="mt-1 block w-full border rounded p-2" value="{{ $category->name }}">

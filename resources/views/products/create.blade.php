@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold mb-4">Create Product</h1>
         <form action="{{ route('products.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
-            {{-- <div class="mb-4">
+            <div class="mb-4">
                 <label class="block text-sm font-medium">Tenant</label>
                 <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
                     <option value="">None</option>
@@ -23,7 +23,7 @@
                     @endforeach
                 </select>
                 @error('business_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div> --}}
+            </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Category</label>
                 <select name="category_id" class="mt-1 block w-full border rounded p-2">

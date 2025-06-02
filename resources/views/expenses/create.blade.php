@@ -5,7 +5,7 @@
         <h1 class="text-2xl font-bold mb-4">Create Expense</h1>
         <form action="{{ route('expenses.store') }}" method="POST">
             @csrf
-            {{-- <div class="mb-4">
+            <div class="mb-4">
                 <label class="block text-sm font-medium">Tenant</label>
                 <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
                     @foreach ($tenants as $tenant)
@@ -31,7 +31,7 @@
                     @endforeach
                 </select>
                 @error('location_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div> --}}
+            </div>
             <div class="mb-4">
                 <label class="block text-sm font-medium">Employee</label>
                 <select name="user_id" class="mt-1 block w-full border rounded p-2">

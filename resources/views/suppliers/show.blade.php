@@ -4,8 +4,8 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Supplier Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            {{-- <p><strong>Tenant:</strong> {{ $supplier->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $supplier->business->name }}</p> --}}
+            <p><strong>Tenant:</strong> {{ $supplier->tenant->name }}</p>
+            <p><strong>Business:</strong> {{ $supplier->business->name }}</p>
             <p><strong>Name:</strong> {{ $supplier->name }}</p>
             <p><strong>Email:</strong> {{ $supplier->email ?? 'N/A' }}</p>
             <p><strong>Phone:</strong> {{ $supplier->phone ?? 'N/A' }}</p>

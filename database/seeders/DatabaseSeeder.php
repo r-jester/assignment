@@ -151,6 +151,25 @@ class DatabaseSeeder extends Seeder
                 'image' => 'uploads/employees/default.jpg'
             ]
         );
+        $employee = Employee::firstOrCreate(
+            [
+                // 'tenant_id' => 1,
+                // 'business_id' => 1,
+                'department_id' => 1,
+                'position_id' => 1,
+                'role_id' => 5,
+                'username' => 'admin',
+                'password' => Hash::make('admin'),
+                'first_name' => 'Super',
+                'last_name' => 'admin',
+                'email' => 'superadmin@fake.com',
+                'phone' => '12345678',
+                'hire_date' => now(),
+                'salary' => 100000,
+                'status' => 'active',
+                'image' => 'uploads/employees/default.jpg'
+            ]
+        );
 
         $employee->assignRole('super-admin');
 

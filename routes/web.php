@@ -46,8 +46,8 @@ Route::middleware('user-auth')->group(function () {
     Route::resource('business_locations', BusinessLocationController::class);
     Route::resource('products', ProductController::class);
     Route::resource('categories', CategoryController::class);
-    Route::resource('sales_summaries', SalesSummaryController::class)->only(['index', 'show']);
-    Route::resource('inventory_summaries', InventorySummaryController::class)->only(['index', 'show']);
+    Route::resource('sales_summaries', SalesSummaryController::class);
+    Route::resource('inventory_summaries', InventorySummaryController::class);
     Route::resource('currencies', CurrencyController::class);
     Route::resource('customers', CustomerController::class);
     Route::resource('suppliers', SupplierController::class);

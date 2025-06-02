@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
-use App\Models\Tenant;
 use App\Models\Business;
 use Illuminate\Http\Request;
 
@@ -41,7 +40,6 @@ class SupplierController extends Controller
 
     public function show(Supplier $supplier)
     {
-        $supplier->load(['tenant', 'business']);
         return view('suppliers.show', compact('supplier'));
     }
 

@@ -25,9 +25,9 @@
         <form action="/login" method="POST">
             @csrf
             <label for="user">Username</label>
-            <input type="text" name="txtuser" placeholder="please input your username" class="form-control">
+            <input type="text" name="username" placeholder="please input your username" class="form-control">
             <label for="pass">Password</label>
-            <input type="password" name="txtpass" placeholder="************" class="form-control">
+            <input type="password" name="password" placeholder="************" class="form-control">
 
             <div align="center" style="margin-top:20px;">
                 <button type="submit" class="btn btn-danger">login</button>

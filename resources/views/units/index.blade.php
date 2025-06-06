@@ -9,8 +9,6 @@
                 <tr>
                     <th class="py-2 px-4 border-b">Name</th>
                     <th class="py-2 px-4 border-b">Short Name</th>
-                    <th class="py-2 px-4 border-b">Tenant</th>
-                    <th class="py-2 px-4 border-b">Business</th>
                     <th class="py-2 px-4 border-b">Actions</th>
                 </tr>
             </thead>
@@ -19,8 +17,6 @@
                     <tr>
                         <td class="py-2 px-4 border-b">{{ $unit->name }}</td>
                         <td class="py-2 px-4 border-b">{{ $unit->short_name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $unit->tenant->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $unit->business->name }}</td>
                         <td class="py-2 px-4 border-b">
                             <a href="{{ route('units.show', $unit) }}" class="text-blue-500">View</a>
                             <a href="{{ route('units.edit', $unit) }}" class="text-green-500 ml-2">Edit</a>

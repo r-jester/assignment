@@ -10,7 +10,6 @@ class SalesSummarySeeder extends Seeder
 {
     public function run()
     {
-        BusinessLocation::factory()->count(5)->create(); // Problematic if tenant_id is missing
         SalesSummary::factory()->count(10)->create();
     }
 }

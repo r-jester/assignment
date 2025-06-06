@@ -10,16 +10,15 @@ class Employee extends Authenticatable
 {
     use HasFactory, HasRoles;
 
+    protected $table = 'employees';
+
     protected $fillable = [
-        // 'tenant_id',
-        // 'business_id',
         'department_id',
         'position_id',
-        'role_id',
         'username',
         'password',
-        'first_name',  // Make sure these are here
-        'last_name',   // and not 'name'
+        'first_name',
+        'last_name',
         'email',
         'phone',
         'hire_date',
@@ -28,18 +27,19 @@ class Employee extends Authenticatable
         'image'
     ];
 
-    protected $hidden = [
-        'password',
+    protected $hidden = ['password', 'remember_token'];
+
+    protected $casts = [
+        'hire_date' => 'date',
     ];
 
-    public function tenant()
+    public function getImageUrlAttribute()
     {
-        return $this->belongsTo(Tenant::class);
-    }
+        if ($this->image && \Storage::exists($this->image)) {
+            return \Storage::url($this->image);
+        }
 
-    public function business()
-    {
-        return $this->belongsTo(Business::class);
+        return asset('storage/employees/default.jpg');
     }
 
     public function department()
@@ -51,16 +51,4 @@ class Employee extends Authenticatable
     {
         return $this->belongsTo(Position::class);
     }
-
-    // You might want to keep this if you have a separate role_id field
-    public function role()
-    {
-        return $this->belongsTo(Role::class);
-    }
-
-    // Remove this as it's now handled by the HasRoles trait
-    // public function roles()
-    // {
-    //     return $this->belongsToMany(\Spatie\Permission\Models\Role::class);
-    // }
 }

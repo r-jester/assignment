@@ -3,12 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\LoginController;
 
-// Route::get('/user', function (Request $request) {
-//     return $request->user();
-// })->middleware('auth:sanctum');
-
-Route::get('/users', [UserController::class, 'index']);
-Route::post('/users/create', [UserController::class, 'create']);
-Route::put('/users/edit/{id}', [UserController::class, 'edit']);
-Route::delete('/users/delete/{id}', [UserController::class, 'destroy']);
+Route::post('/users/login', [LoginController::class, 'login']);
+Route::get('/users', [UserController::class, 'getUser']);
+Route::post('/users/create', [UserController::class, 'addUser']);
+Route::patch('/users/update/{id}', [UserController::class, 'updateUser']);
+Route::delete('/users/delete/{id}', [UserController::class, 'deleteUser']);
+Route::get('/departments', [UserController::class, 'getDepartments']);
+Route::get('/positions', [UserController::class, 'getPositions']);

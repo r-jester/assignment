@@ -10,14 +10,10 @@ class CreatePaymentMethodsTable extends Migration
     {
         Schema::create('payment_methods', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('tenant_id')->nullable();
-            $table->unsignedBigInteger('business_id');
             $table->string('name');
             $table->boolean('is_active')->default(true);
             $table->timestamps();
 
-            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('set null');
-            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
         });
     }
 

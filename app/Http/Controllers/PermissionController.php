@@ -2,131 +2,109 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Role as SpatieRole;
 use Spatie\Permission\Models\Permission;
 use App\Models\Employee;
-use Spatie\Permission\Exceptions\UnauthorizedException;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\File;
-use Illuminate\Support\Str;
 
 class PermissionController extends Controller
 {
-    protected $actions = ['view', 'create', 'edit', 'delete'];
+    public function index()
+    {
+        $query = SpatieRole::query();
+        
+        // Only superadmin can see the superadmin role
+        if (!auth()->user()->hasRole('superadmin')) {
+            $query->where('name', '!=', 'superadmin');
+        }
+        
+        $roles = $query->get();
+        return view('permissions.index', compact('roles'));
+    }
+
+    public function createAssign()
+    {
+        $employees = Employee::all();
+        $roles = auth()->user()->hasRole('superadmin') 
+            ? SpatieRole::all() 
+            : SpatieRole::where('name', '!=', 'superadmin')->get();
+        return view('permissions.assign', compact('employees', 'roles'));
+    }
+
+    public function assignPermission(Request $request)
+    {
+        $request->validate([
+            'employee_id' => 'required|exists:employees,id',
+            'roles' => 'array',
+            'roles.*' => 'exists:roles,id',
+        ]);
+
+        $employee = Employee::findOrFail($request->employee_id);
+        
+        // Prevent non-superadmins from assigning the superadmin role
+        if (!auth()->user()->hasRole('superadmin')) {
+            $roles = array_filter($request->input('roles', []), function ($roleId) {
+                $role = SpatieRole::find($roleId);
+                return $role && $role->name !== 'superadmin';
+            });
+            $employee->syncRoles($roles);
+        } else {
+            $employee->syncRoles($request->input('roles', []));
+        }
+
+        return redirect()->route('permissions.index')->with('success', 'Roles assigned successfully.');
+    }
+
+    public function edit($id)
+    {
+        $role = SpatieRole::findOrFail($id);
+
+        // Prevent non-superadmins from editing superadmin role permissions
+        if ($role->name === 'superadmin' && !auth()->user()->hasRole('superadmin')) {
+            abort(403, 'Unauthorized to edit superadmin role permissions.');
+        }
+
+        $modules = $this->getModules();
+        $actions = ['view', 'create', 'edit', 'delete'];
+        $permissions = Permission::all()->groupBy(function ($permission) {
+            return explode('-', $permission->name)[1] ?? 'permissions';
+        });
+
+        return view('roles.permission', compact('role', 'modules', 'actions', 'permissions'));
+    }
+
+    public function update(Request $request, $id)
+    {
+        $role = SpatieRole::findOrFail($id);
+
+        // Prevent non-superadmins from updating superadmin role permissions
+        if ($role->name === 'superadmin' && !auth()->user()->hasRole('superadmin')) {
+            abort(403, 'Unauthorized to update superadmin role permissions.');
+        }
+
+        $permissions = $request->input('permissions', []);
+
+        // Sync permissions to role_has_permissions table
+        $role->syncPermissions($permissions);
+
+        return redirect()->route('roles.index')->with('success', 'Permissions updated successfully.');
+    }
 
     protected function getModules()
     {
-        $controllersPath = app_path('Http/Controllers');
+        $viewsPath = resource_path('views');
         $modules = [];
 
-        $files = File::files($controllersPath);
-        foreach ($files as $file) {
-            $filename = $file->getFilenameWithoutExtension();
-            if (str_ends_with($filename, 'Controller')) {
-                $moduleName = str_replace('Controller', '', $filename);
-                $moduleName = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $moduleName));
-                $moduleName = Str::plural($moduleName);
+        $directories = File::directories($viewsPath);
+        foreach ($directories as $directory) {
+            $moduleName = basename($directory);
+            if ($moduleName !== 'layouts' && $moduleName !== 'components' && $moduleName !== 'auth') {
                 $modules[] = $moduleName;
             }
         }
 
         $modules = array_unique(array_merge($modules, ['permissions']));
-
         return $modules;
-    }
-
-    public function index(Request $request)
-    {
-        if (!auth()->user()->hasPermissionTo('manage-permissions')) {
-            throw UnauthorizedException::forPermissions(['manage-permissions']);
-        }
-
-        $roles = Role::all();
-        $employees = Employee::all();
-        $modules = $this->getModules();
-        $actions = $this->actions;
-
-        // Ensure all permissions exist
-        foreach ($modules as $module) {
-            foreach ($actions as $action) {
-                Permission::firstOrCreate(['name' => "$action-$module", 'guard_name' => 'web']);
-            }
-        }
-        Permission::firstOrCreate(['name' => 'manage-permissions', 'guard_name' => 'web']);
-
-        // Get selected entity
-        $selectedType = $request->input('type', 'role');
-        $selectedRoleId = $request->input('role_id', $roles->first()->id ?? null);
-        $selectedEmployeeId = $request->input('employee_id', null);
-        $selectedPermissions = [];
-
-        if ($selectedType === 'role' && $selectedRoleId) {
-            $role = Role::find($selectedRoleId);
-            $selectedPermissions = $role ? $role->permissions->pluck('name')->toArray() : [];
-        } elseif ($selectedType === 'employee' && $selectedEmployeeId) {
-            $employee = Employee::find($selectedEmployeeId);
-            $selectedPermissions = $employee ? $employee->permissions->pluck('name')->toArray() : [];
-        }
-
-        return view('permissions.index', compact(
-            'roles',
-            'employees',
-            'modules',
-            'actions',
-            'selectedType',
-            'selectedRoleId',
-            'selectedEmployeeId',
-            'selectedPermissions'
-        ));
-    }
-
-    public function getPermissions(Request $request)
-    {
-        if (!auth()->user()->hasPermissionTo('manage-permissions')) {
-            return response()->json(['error' => 'Unauthorized'], 403);
-        }
-
-        $type = $request->input('type');
-        $id = $request->input('id');
-        $permissions = [];
-
-        if ($type === 'role' && $id) {
-            $role = Role::find($id);
-            $permissions = $role ? $role->permissions->pluck('name')->toArray() : [];
-        } elseif ($type === 'employee' && $id) {
-            $employee = Employee::find($id);
-            $permissions = $employee ? $employee->permissions->pluck('name')->toArray() : [];
-        }
-
-        return response()->json(['permissions' => $permissions]);
-    }
-
-    public function update(Request $request)
-    {
-        if (!auth()->user()->hasPermissionTo('manage-permissions')) {
-            throw UnauthorizedException::forPermissions(['manage-permissions']);
-        }
-
-        $validated = $request->validate([
-            'type' => 'required|in:role,employee',
-            'role_id' => 'required_if:type,role|nullable|exists:roles,id',
-            'employee_id' => 'required_if:type,employee|nullable|exists:employees,id',
-            'permissions' => 'array',
-            'permissions.*' => 'exists:permissions,name',
-        ]);
-
-        if ($validated['type'] === 'role' && $validated['role_id']) {
-            $role = Role::findOrFail($validated['role_id']);
-            $role->syncPermissions($validated['permissions'] ?? []);
-        } elseif ($validated['type'] === 'employee' && $validated['employee_id']) {
-            $employee = Employee::findOrFail($validated['employee_id']);
-            $employee->syncPermissions($validated['permissions'] ?? []);
-        }
-
-        return redirect()->route('permissions.index', [
-            'type' => $validated['type'],
-            'role_id' => $validated['role_id'],
-            'employee_id' => $validated['employee_id']
-        ])->with('success', 'Permissions updated successfully.');
     }
 }

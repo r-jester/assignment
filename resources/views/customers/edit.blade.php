@@ -6,30 +6,6 @@
         <form action="{{ route('customers.update', $customer) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
-            {{-- <div class="form-group">
-                <label for="tenant_id">Tenant</label>
-                <select name="tenant_id" id="tenant_id" class="form-control @error('tenant_id') is-invalid @enderror">
-                    <option value="">Select Tenant</option>
-                    @foreach ($tenants as $tenant)
-                        <option value="{{ $tenant->id }}" {{ old('tenant_id', $customer->tenant_id) == $tenant->id ? 'selected' : '' }}>{{ $tenant->name }}</option>
-                    @endforeach
-                </select>
-                @error('tenant_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div>
-            <div class="form-group">
-                <label for="business_id">Business</label>
-                <select name="business_id" id="business_id" class="form-control @error('business_id') is-invalid @enderror">
-                    <option value="">Select Business</option>
-                    @foreach ($businesses as $business)
-                        <option value="{{ $business->id }}" {{ old('business_id', $customer->business_id) == $business->id ? 'selected' : '' }}>{{ $business->name }}</option>
-                    @endforeach
-                </select>
-                @error('business_id')
-                    <div class="invalid-feedback">{{ $message }}</div>
-                @enderror
-            </div> --}}
             <div class="form-group">
                 <label for="first_name">First Name</label>
                 <input type="text" name="first_name" id="first_name" class="form-control @error('first_name') is-invalid @enderror" value="{{ old('first_name', $customer->first_name) }}">

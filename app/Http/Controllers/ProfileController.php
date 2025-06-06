@@ -29,6 +29,6 @@ class ProfileController extends Controller
             'phone' => $request->phone,
         ]);
 
-        return redirect()->route('dashboard')->with('success', 'Profile updated successfully. Looking good!');
+        return redirect()->route('home')->with('success', 'Profile updated successfully. Looking good!');
     }
 }

@@ -10,8 +10,6 @@ class Department extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id',
-        'business_id',
         'name',
         'description',
     ];
@@ -19,15 +17,5 @@ class Department extends Model
     public function employees()
     {
         return $this->hasMany(Employee::class);
-    }
-
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
-    public function business()
-    {
-        return $this->belongsTo(Business::class);
     }
 }

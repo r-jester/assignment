@@ -9,10 +9,6 @@ class Currency extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['tenant_id', 'code', 'name', 'symbol'];
+    protected $fillable = ['code', 'name', 'symbol'];
 
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
 }

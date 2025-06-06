@@ -5,84 +5,71 @@ namespace App\Http\Controllers;
 use App\Models\Role;
 use Illuminate\Http\Request;
 use Spatie\Permission\Exceptions\UnauthorizedException;
+use Spatie\Permission\Models\Role as SpatieRole;
 
 class RoleController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        if (!auth()->user()->hasPermissionTo('view-roles')) {
-            throw UnauthorizedException::forPermissions(['view-roles']);
+        $query = SpatieRole::query();
+        
+        // Only superadmin can see the superadmin role
+        if (!auth()->user()->hasRole('superadmin')) {
+            $query->where('name', '!=', 'superadmin');
         }
-
-        $roles = Role::all();
+        
+        $roles = $query->get();
         return view('roles.index', compact('roles'));
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
     public function create()
     {
-        if (!auth()->user()->hasPermissionTo('create-roles')) {
-            throw UnauthorizedException::forPermissions(['create-roles']);
-        }
-
         return view('roles.create');
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        if (!auth()->user()->hasPermissionTo('create-roles')) {
-            throw UnauthorizedException::forPermissions(['create-roles']);
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:255|unique:roles,name',
             'description' => 'nullable|string',
         ]);
 
-        Role::create($validated);
+        SpatieRole::create($validated);
 
         return redirect()->route('roles.index')->with('success', 'Role created successfully.');
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(Role $role)
+    public function show($id)
     {
-        if (!auth()->user()->hasPermissionTo('view-roles')) {
-            throw UnauthorizedException::forPermissions(['view-roles']);
+        $role = SpatieRole::findOrFail($id);
+        
+        // Prevent non-superadmins from viewing superadmin role details
+        if ($role->name === 'superadmin' && !auth()->user()->hasRole('superadmin')) {
+            abort(403, 'Unauthorized to view superadmin role.');
         }
-
+        
         return view('roles.show', compact('role'));
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Role $role)
+    public function edit($id)
     {
-        if (!auth()->user()->hasPermissionTo('edit-roles')) {
-            throw UnauthorizedException::forPermissions(['edit-roles']);
+        $role = SpatieRole::findOrFail($id);
+        
+        // Prevent non-superadmins from editing superadmin role
+        if ($role->name === 'superadmin' && !auth()->user()->hasRole('superadmin')) {
+            abort(403, 'Unauthorized to edit superadmin role.');
         }
-
+        
         return view('roles.edit', compact('role'));
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, Role $role)
+    public function update(Request $request, $id)
     {
-        if (!auth()->user()->hasPermissionTo('edit-roles')) {
-            throw UnauthorizedException::forPermissions(['edit-roles']);
+        $role = SpatieRole::findOrFail($id);
+        
+        // Prevent non-superadmins from updating superadmin role
+        if ($role->name === 'superadmin' && !auth()->user()->hasRole('superadmin')) {
+            abort(403, 'Unauthorized to update superadmin role.');
         }
 
         $validated = $request->validate([
@@ -95,21 +82,23 @@ class RoleController extends Controller
         return redirect()->route('roles.index')->with('success', 'Role updated successfully.');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(Role $role)
+    public function destroy($id)
     {
-        if (!auth()->user()->hasPermissionTo('delete-roles')) {
-            throw UnauthorizedException::forPermissions(['delete-roles']);
-        }
+        $role = SpatieRole::findOrFail($id);
 
-        if ($role->employees()->count() > 0) {
-            return redirect()->route('roles.index')->with('error', 'Cannot delete role with assigned employees.');
-        }
-
-        if ($role->name === 'Super Admin') {
+        // Prevent deletion of superadmin role
+        if ($role->name === 'superadmin') {
             return redirect()->route('roles.index')->with('error', 'Cannot delete the Super Admin role.');
+        }
+
+        // Prevent admin from deleting their own role
+        if (auth()->user()->hasRole($role->name) && !auth()->user()->hasRole('superadmin')) {
+            return redirect()->route('roles.index')->with('error', 'You cannot delete your own role.');
+        }
+
+        // Check if role has assigned users
+        if ($role->users()->count() > 0) {
+            return redirect()->route('roles.index')->with('error', 'Cannot delete role with assigned employees.');
         }
 
         $role->delete();

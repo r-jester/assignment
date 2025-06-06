@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\InventorySummary;
 use App\Models\InventoryAdjustment;
-use App\Models\Tenant;
-use App\Models\Business;
-use App\Models\BusinessLocation;
 use App\Models\Product;
 use Illuminate\Http\Request;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -16,37 +13,19 @@ class InventorySummaryController extends Controller
 {
     public function index()
     {
-        // if (!auth()->user()->hasPermissionTo('view-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['view-inventory-summaries']);
-        // }
-
-        $inventorySummaries = InventorySummary::with(['tenant', 'business', 'location', 'product'])->paginate(10);
+        $inventorySummaries = InventorySummary::with(['product'])->paginate(10);
         return view('inventory_summaries.index', compact('inventorySummaries'));
     }
 
     public function create()
     {
-        // if (!auth()->user()->hasPermissionTo('create-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['create-inventory-summaries']);
-        // }
-
-        $tenants = Tenant::all();
-        $businesses = Business::all();
-        $locations = BusinessLocation::all();
         $products = Product::all();
-        return view('inventory_summaries.create', compact('tenants', 'businesses', 'locations', 'products'));
+        return view('inventory_summaries.create', compact('products'));
     }
 
     public function store(Request $request)
     {
-        // if (!auth()->user()->hasPermissionTo('create-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['create-inventory-summaries']);
-        // }
-
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'business_id' => 'required|exists:businesses,id',
-            'location_id' => 'required|exists:business_locations,id',
             'product_id' => 'required|exists:products,id',
             'adjustment_type' => 'required|in:increase,decrease',
             'quantity' => 'required|integer|min:1',
@@ -58,9 +37,6 @@ class InventorySummaryController extends Controller
             $product = Product::find($validated['product_id']);
             $inventorySummary = InventorySummary::firstOrCreate(
                 [
-                    'tenant_id' => $validated['tenant_id'],
-                    'business_id' => $validated['business_id'],
-                    'location_id' => $validated['location_id'],
                     'product_id' => $validated['product_id'],
                 ],
                 [
@@ -78,17 +54,11 @@ class InventorySummaryController extends Controller
                     throw new \Exception("Cannot decrease stock below 0 for product {$product->name}. Current stock: {$inventorySummary->stock_quantity}.");
                 }
             }
-
-            // Update InventorySummary
             $inventorySummary->update([
                 'stock_quantity' => $newStockQuantity,
                 'last_updated' => now(),
             ]);
-
-            // Sync Product stock_quantity
             $product->update(['stock_quantity' => $newStockQuantity]);
-
-            // Log adjustment
             InventoryAdjustment::create([
                 'inventory_summary_id' => $inventorySummary->id,
                 'product_id' => $validated['product_id'],
@@ -108,37 +78,19 @@ class InventorySummaryController extends Controller
 
     public function show(InventorySummary $inventorySummary)
     {
-        // if (!auth()->user()->hasPermissionTo('view-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['view-inventory-summaries']);
-        // }
-
-        $inventorySummary->load(['tenant', 'business', 'location', 'product']);
+        $inventorySummary->load(['product']);
         return view('inventory_summaries.show', compact('inventorySummary'));
     }
 
     public function edit(InventorySummary $inventorySummary)
     {
-        // if (!auth()->user()->hasPermissionTo('edit-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['edit-inventory-summaries']);
-        // }
-
-        $tenants = Tenant::all();
-        $businesses = Business::all();
-        $locations = BusinessLocation::all();
         $products = Product::all();
-        return view('inventory_summaries.edit', compact('inventorySummary', 'tenants', 'businesses', 'locations', 'products'));
+        return view('inventory_summaries.edit', compact('inventorySummary', 'products'));
     }
 
     public function update(Request $request, InventorySummary $inventorySummary)
     {
-        // if (!auth()->user()->hasPermissionTo('edit-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['edit-inventory-summaries']);
-        // }
-
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'business_id' => 'required|exists:businesses,id',
-            'location_id' => 'required|exists:business_locations,id',
             'product_id' => 'required|exists:products,id',
             'adjustment_type' => 'required|in:increase,decrease',
             'quantity' => 'required|integer|min:1',
@@ -158,21 +110,12 @@ class InventorySummaryController extends Controller
                     throw new \Exception("Cannot decrease stock below 0 for product {$product->name}. Current stock: {$inventorySummary->stock_quantity}.");
                 }
             }
-
-            // Update InventorySummary
             $inventorySummary->update([
-                'tenant_id' => $validated['tenant_id'],
-                'business_id' => $validated['business_id'],
-                'location_id' => $validated['location_id'],
                 'product_id' => $validated['product_id'],
                 'stock_quantity' => $newStockQuantity,
                 'last_updated' => now(),
             ]);
-
-            // Sync Product stock_quantity
             $product->update(['stock_quantity' => $newStockQuantity]);
-
-            // Log adjustment
             InventoryAdjustment::create([
                 'inventory_summary_id' => $inventorySummary->id,
                 'product_id' => $validated['product_id'],
@@ -192,23 +135,15 @@ class InventorySummaryController extends Controller
 
     public function destroy(InventorySummary $inventorySummary)
     {
-        // if (!auth()->user()->hasPermissionTo('delete-inventory-summaries')) {
-        //     throw UnauthorizedException::forPermissions(['delete-inventory-summaries']);
-        // }
-
         DB::beginTransaction();
         try {
             $product = Product::find($inventorySummary->product_id);
-            if ($product) {
-                // Subtract the InventorySummary stock from Product stock
-                $newStockQuantity = $product->stock_quantity - $inventorySummary->stock_quantity;
+            if ($product) {                $newStockQuantity = $product->stock_quantity - $inventorySummary->stock_quantity;
                 if ($newStockQuantity < 0) {
                     throw new \Exception("Cannot delete inventory summary as it would result in negative stock for product {$product->name}.");
                 }
                 $product->update(['stock_quantity' => $newStockQuantity]);
             }
-
-            // Delete the InventorySummary (related InventoryAdjustments are deleted via cascade)
             $inventorySummary->delete();
 
             DB::commit();

@@ -10,16 +10,6 @@ class Unit extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'business_id', 'name', 'short_name'
+        'name', 'short_name'
     ];
-
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
-    }
-
-    public function business()
-    {
-        return $this->belongsTo(Business::class);
-    }
 }

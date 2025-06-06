@@ -18,9 +18,6 @@
             <thead>
                 <tr>
                     <th class="py-2 px-4 border-b">Product</th>
-                    <th class="py-2 px-4 border-b">Tenant</th>
-                    <th class="py-2 px-4 border-b">Business</th>
-                    <th class="py-2 px-4 border-b">Location</th>
                     <th class="py-2 px-4 border-b">Stock Quantity</th>
                     <th class="py-2 px-4 border-b">Last Updated</th>
                     <th class="py-2 px-4 border-b">Actions</th>
@@ -30,9 +27,6 @@
                 @foreach ($inventorySummaries as $inventorySummary)
                     <tr>
                         <td class="py-2 px-4 border-b">{{ $inventorySummary->product ? $inventorySummary->product->name : 'N/A' }}</td>
-                        <td class="py-2 px-4 border-b">{{ $inventorySummary->product ? $inventorySummary->tenant->name : 'N/A' }}</td>
-                        <td class="py-2 px-4 border-b">{{ $inventorySummary->product ? $inventorySummary->business->name : 'N/A' }}</td>
-                        <td class="py-2 px-4 border-b">{{ $inventorySummary->product ? $inventorySummary->location->name : 'N/A' }}</td>
                         <td class="py-2 px-4 border-b">{{ $inventorySummary->stock_quantity }}</td>
                         <td class="py-2 px-4 border-b">{{ $inventorySummary->last_updated->format('Y-m-d H:i:s') }}</td>
                         <td class="py-2 px-4 border-b">

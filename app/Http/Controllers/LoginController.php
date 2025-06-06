@@ -29,7 +29,7 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
             RateLimiter::clear($key);
-            return redirect()->intended(route('dashboard'));
+            return redirect()->intended(route('home'));
         }
 
         // Increment rate-limiter and return error

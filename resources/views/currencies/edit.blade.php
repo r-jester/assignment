@@ -7,15 +7,6 @@
             @csrf
             @method('PUT')
             <div class="mb-4">
-                <label class="block text-sm font-medium">Tenant</label>
-                <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
-                    @foreach ($tenants as $tenant)
-                        <option value="{{ $tenant->id }}" {{ $currency->tenant_id == $tenant->id ? 'selected' : '' }}>{{ $tenant->name }}</option>
-                    @endforeach
-                </select>
-                @error('tenant_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div>
-            <div class="mb-4">
                 <label class="block text-sm font-medium">Code</label>
                 <input type="text" name="code" class="mt-1 block w-full border rounded p-2" value="{{ $currency->code }}">
                 @error('code') <span class="text-red-500">{{ $message }}</span> @enderror

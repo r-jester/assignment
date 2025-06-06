@@ -6,25 +6,6 @@
         <form action="{{ route('payment_methods.store') }}" method="POST">
             @csrf
             <div class="mb-4">
-                <label class="block text-sm font-medium">Tenant</label>
-                <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
-                    <option value="">None</option>
-                    @foreach ($tenants as $tenant)
-                        <option value="{{ $tenant->id }}">{{ $tenant->name }}</option>
-                    @endforeach
-                </select>
-                @error('tenant_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium">Business</label>
-                <select name="business_id" class="mt-1 block w-full border rounded p-2">
-                    @foreach ($businesses as $business)
-                        <option value="{{ $business->id }}">{{ $business->name }}</option>
-                    @endforeach
-                </select>
-                @error('business_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div>
-            <div class="mb-4">
                 <label class="block text-sm font-medium">Name</label>
                 <input type="text" name="name" class="mt-1 block w-full border rounded p-2" value="{{ old('name') }}">
                 @error('name') <span class="text-red-500">{{ $message }}</span> @enderror

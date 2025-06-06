@@ -3,30 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Supplier;
-use App\Models\Business;
 use Illuminate\Http\Request;
 
 class SupplierController extends Controller
 {
     public function index()
     {
-        // $suppliers = Supplier::with(['tenant', 'business'])->paginate(10);
         $suppliers = Supplier::paginate(10);
         return view('suppliers.index', compact('suppliers'));
     }
 
     public function create()
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
         return view('suppliers.create');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'nullable|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',
@@ -45,16 +39,12 @@ class SupplierController extends Controller
 
     public function edit(Supplier $supplier)
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
         return view('suppliers.edit', compact('supplier'));
     }
 
     public function update(Request $request, Supplier $supplier)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'nullable|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
             'name' => 'required|string|max:255',
             'email' => 'nullable|email|max:255',
             'phone' => 'nullable|string|max:20',

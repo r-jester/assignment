@@ -1,17 +1,25 @@
 @extends('layouts.app')
-  @section('title', 'Role Details')
-  @section('content')
-      <h1>Role: {{ $role->name }}</h1>
-      <p><strong>Description:</strong> {{ $role->description ?? '-' }}</p>
-      <a href="{{ route('roles.index') }}" class="btn btn-primary">Back to Roles</a>
-      @can('edit-roles')
-          <a href="{{ route('roles.edit', $role) }}" class="btn btn-warning">Edit</a>
-      @endcan
-      @can('delete-roles')
-          <form action="{{ route('roles.destroy', $role) }}" method="POST" style="display:inline;">
-              @csrf
-              @method('DELETE')
-              <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
-          </form>
-      @endcan
-  @endsection
+@section('title', 'Role Details')
+@section('content')
+    <h1>Role: {{ $role->name }}</h1>
+    <div class="card">
+        <div class="card-body">
+            <p><strong>Name:</strong> {{ $role->name }}</p>
+            <p><strong>Description:</strong> {{ $role->description ?? '-' }}</p>
+            <p><strong>Permissions:</strong></p>
+            <ul>
+                @if ($role->permissions->isNotEmpty())
+                    @foreach ($role->permissions as $permission)
+                        <li>{{ $permission->name }}</li>
+                    @endforeach
+                @else
+                    <li>No permissions assigned</li>
+                @endif
+            </ul>
+        </div>
+    </div>
+    <a href="{{ route('roles.index') }}" class="btn btn-secondary mt-3">Back to Roles</a>
+    @can('edit-permissions')
+        <a href="{{ route('permissions.edit', $role->id) }}" class="btn btn-primary mt-3">Update Permissions</a>
+    @endcan
+@endsection

@@ -8,8 +8,6 @@
             <thead>
                 <tr>
                     <th class="py-2 px-4 border-b">Name</th>
-                    <th class="py-2 px-4 border-b">Tenant</th>
-                    <th class="py-2 px-4 border-b">Business</th>
                     <th class="py-2 px-4 border-b">Active</th>
                     <th class="py-2 px-4 border-b">Actions</th>
                 </tr>
@@ -18,8 +16,6 @@
                 @foreach ($paymentMethods as $paymentMethod)
                     <tr>
                         <td class="py-2 px-4 border-b">{{ $paymentMethod->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $paymentMethod->tenant->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $paymentMethod->business->name }}</td>
                         <td class="py-2 px-4 border-b">{{ $paymentMethod->is_active ? 'Yes' : 'No' }}</td>
                         <td class="py-2 px-4 border-b">
                             <a href="{{ route('payment_methods.show', $paymentMethod) }}" class="text-blue-500">View</a>

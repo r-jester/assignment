@@ -17,22 +17,7 @@ class Purchase extends Model
     protected $casts = [
         'status' => 'string',
     ];
-
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class);
-    // }
-
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
-
-    // public function location()
-    // {
-    //     return $this->belongsTo(BusinessLocation::class);
-    // }
-
+    
     public function supplier()
     {
         return $this->belongsTo(Supplier::class);

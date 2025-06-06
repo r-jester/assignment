@@ -1,5 +1,5 @@
 <aside class="sidebar">
-    <div class="sidebar-brand"><a href="/">{{ session()->get('NAME', 'Guest') }}</a></div>
+    <div class="sidebar-brand"><a href="/">{{ auth()->user()->username }}</a></div>
     <ul>
         <li class="{{ Request::routeIs('dashboard') ? 'main-active' : '' }}">
             <a href="#">
@@ -7,37 +7,8 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('dashboard') }}" class="{{ Request::routeIs('dashboard') ? 'active' : '' }}"><i class="fas fa-tachometer-alt"></i> Dashboard</a></li>
-            </ul>
-        </li>
-        <li class="{{ Request::routeIs('tenants.*') ? 'main-active' : '' }}">
-            <a href="#">
-                <i class="fas fa-building"></i> Tenants
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="submenu">
-                <li><a href="{{ route('tenants.index') }}" class="{{ Request::routeIs('tenants.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Tenant List</a></li>
-                <li><a href="{{ route('tenants.create') }}" class="{{ Request::routeIs('tenants.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Tenant</a></li>
-            </ul>
-        </li>
-        <li class="{{ Request::routeIs('businesses.*') ? 'main-active' : '' }}">
-            <a href="#">
-                <i class="fas fa-store"></i> Businesses
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="submenu">
-                <li><a href="{{ route('businesses.index') }}" class="{{ Request::routeIs('businesses.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Business List</a></li>
-                <li><a href="{{ route('businesses.create') }}" class="{{ Request::routeIs('businesses.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Business</a></li>
-            </ul>
-        </li>
-        <li class="{{ Request::routeIs('business_locations.*') ? 'main-active' : '' }}">
-            <a href="#">
-                <i class="fas fa-map-marker-alt"></i> Business Locations
-                <i class="fas fa-chevron-down dropdown-icon"></i>
-            </a>
-            <ul class="submenu">
-                <li><a href="{{ route('business_locations.index') }}" class="{{ Request::routeIs('business_locations.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Location List</a></li>
-                <li><a href="{{ route('business_locations.create') }}" class="{{ Request::routeIs('business_locations.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Location</a></li>
+                <li><a href="{{ route('home') }}" class="{{ Request::routeIs('dashboard') ? 'active' : '' }}"><i
+                            class="fas fa-tachometer-alt"></i> Dashboard</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('products.*') ? 'main-active' : '' }}">
@@ -46,13 +17,21 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('products.index') }}" class="{{ Request::routeIs('products.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Product List</a></li>
-                <li><a href="{{ route('products.create') }}" class="{{ Request::routeIs('products.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Product</a></li>
+                <li><a href="{{ route('products.index') }}"
+                        class="{{ Request::routeIs('products.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Product List</a></li>
+                <li><a href="{{ route('products.create') }}"
+                        class="{{ Request::routeIs('products.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Product</a></li>
                 @can('view-promotions')
-                    <li><a href="{{ route('promotions.index') }}" class="{{ Request::routeIs('promotions.index') ? 'active' : '' }}"><i class="fas fa-tags"></i> Promotions</a></li>
+                    <li><a href="{{ route('promotions.index') }}"
+                            class="{{ Request::routeIs('promotions.index') ? 'active' : '' }}"><i class="fas fa-tags"></i>
+                            Promotions</a></li>
                 @endcan
                 @can('view-discounts')
-                    <li><a href="{{ route('discounts.index') }}" class="{{ Request::routeIs('discounts.index') ? 'active' : '' }}"><i class="fas fa-percent"></i> Discounts</a></li>
+                    <li><a href="{{ route('discounts.index') }}"
+                            class="{{ Request::routeIs('discounts.index') ? 'active' : '' }}"><i
+                                class="fas fa-percent"></i> Discounts</a></li>
                 @endcan
             </ul>
         </li>
@@ -62,8 +41,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('categories.index') }}" class="{{ Request::routeIs('categories.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Category List</a></li>
-                <li><a href="{{ route('categories.create') }}" class="{{ Request::routeIs('categories.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Category</a></li>
+                <li><a href="{{ route('categories.index') }}"
+                        class="{{ Request::routeIs('categories.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Category List</a></li>
+                <li><a href="{{ route('categories.create') }}"
+                        class="{{ Request::routeIs('categories.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Category</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('sales_summaries.*') ? 'main-active' : '' }}">
@@ -72,7 +55,9 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('sales_summaries.index') }}" class="{{ Request::routeIs('sales_summaries.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Sales Summary List</a></li>
+                <li><a href="{{ route('sales_summaries.index') }}"
+                        class="{{ Request::routeIs('sales_summaries.index') ? 'active' : '' }}"><i
+                            class="fas fa-list"></i> Sales Summary List</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('inventory_summaries.*') ? 'main-active' : '' }}">
@@ -81,7 +66,9 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('inventory_summaries.index') }}" class="{{ Request::routeIs('inventory_summaries.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Inventory Summary List</a></li>
+                <li><a href="{{ route('inventory_summaries.index') }}"
+                        class="{{ Request::routeIs('inventory_summaries.index') ? 'active' : '' }}"><i
+                            class="fas fa-list"></i> Inventory Summary List</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('currencies.*') ? 'main-active' : '' }}">
@@ -90,8 +77,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('currencies.index') }}" class="{{ Request::routeIs('currencies.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Currency List</a></li>
-                <li><a href="{{ route('currencies.create') }}" class="{{ Request::routeIs('currencies.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Currency</a></li>
+                <li><a href="{{ route('currencies.index') }}"
+                        class="{{ Request::routeIs('currencies.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Currency List</a></li>
+                <li><a href="{{ route('currencies.create') }}"
+                        class="{{ Request::routeIs('currencies.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Currency</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('customers.*') ? 'main-active' : '' }}">
@@ -100,8 +91,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('customers.index') }}" class="{{ Request::routeIs('customers.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Customer List</a></li>
-                <li><a href="{{ route('customers.create') }}" class="{{ Request::routeIs('customers.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Customer</a></li>
+                <li><a href="{{ route('customers.index') }}"
+                        class="{{ Request::routeIs('customers.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Customer List</a></li>
+                <li><a href="{{ route('customers.create') }}"
+                        class="{{ Request::routeIs('customers.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Customer</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('suppliers.*') ? 'main-active' : '' }}">
@@ -110,8 +105,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('suppliers.index') }}" class="{{ Request::routeIs('suppliers.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Supplier List</a></li>
-                <li><a href="{{ route('suppliers.create') }}" class="{{ Request::routeIs('suppliers.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Supplier</a></li>
+                <li><a href="{{ route('suppliers.index') }}"
+                        class="{{ Request::routeIs('suppliers.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Supplier List</a></li>
+                <li><a href="{{ route('suppliers.create') }}"
+                        class="{{ Request::routeIs('suppliers.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Supplier</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('employees.*') ? 'main-active' : '' }}">
@@ -120,8 +119,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('employees.index') }}" class="{{ Request::routeIs('employees.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Employee List</a></li>
-                <li><a href="{{ route('employees.create') }}" class="{{ Request::routeIs('employees.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Employee</a></li>
+                <li><a href="{{ route('employees.index') }}"
+                        class="{{ Request::routeIs('employees.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Employee List</a></li>
+                <li><a href="{{ route('employees.create') }}"
+                        class="{{ Request::routeIs('employees.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Employee</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('purchases.*') ? 'main-active' : '' }}">
@@ -130,8 +133,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('purchases.index') }}" class="{{ Request::routeIs('purchases.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Purchase List</a></li>
-                <li><a href="{{ route('purchases.create') }}" class="{{ Request::routeIs('purchases.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Purchase</a></li>
+                <li><a href="{{ route('purchases.index') }}"
+                        class="{{ Request::routeIs('purchases.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Purchase List</a></li>
+                <li><a href="{{ route('purchases.create') }}"
+                        class="{{ Request::routeIs('purchases.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Purchase</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('expenses.*') ? 'main-active' : '' }}">
@@ -140,8 +147,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('expenses.index') }}" class="{{ Request::routeIs('expenses.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Expense List</a></li>
-                <li><a href="{{ route('expenses.create') }}" class="{{ Request::routeIs('expenses.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Expense</a></li>
+                <li><a href="{{ route('expenses.index') }}"
+                        class="{{ Request::routeIs('expenses.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Expense List</a></li>
+                <li><a href="{{ route('expenses.create') }}"
+                        class="{{ Request::routeIs('expenses.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Expense</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('sales.*') ? 'main-active' : '' }}">
@@ -150,8 +161,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('sales.index') }}" class="{{ Request::routeIs('sales.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Sale List</a></li>
-                <li><a href="{{ route('sales.create') }}" class="{{ Request::routeIs('sales.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Sale</a></li>
+                <li><a href="{{ route('sales.index') }}"
+                        class="{{ Request::routeIs('sales.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Sale List</a></li>
+                <li><a href="{{ route('sales.create') }}"
+                        class="{{ Request::routeIs('sales.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Sale</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('tax_rates.*') ? 'main-active' : '' }}">
@@ -160,8 +175,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('tax_rates.index') }}" class="{{ Request::routeIs('tax_rates.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Tax Rate List</a></li>
-                <li><a href="{{ route('tax_rates.create') }}" class="{{ Request::routeIs('tax_rates.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Tax Rate</a></li>
+                <li><a href="{{ route('tax_rates.index') }}"
+                        class="{{ Request::routeIs('tax_rates.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Tax Rate List</a></li>
+                <li><a href="{{ route('tax_rates.create') }}"
+                        class="{{ Request::routeIs('tax_rates.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Tax Rate</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('units.*') ? 'main-active' : '' }}">
@@ -170,8 +189,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('units.index') }}" class="{{ Request::routeIs('units.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Unit List</a></li>
-                <li><a href="{{ route('units.create') }}" class="{{ Request::routeIs('units.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Unit</a></li>
+                <li><a href="{{ route('units.index') }}"
+                        class="{{ Request::routeIs('units.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Unit List</a></li>
+                <li><a href="{{ route('units.create') }}"
+                        class="{{ Request::routeIs('units.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Unit</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('payment_methods.*') ? 'main-active' : '' }}">
@@ -180,8 +203,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('payment_methods.index') }}" class="{{ Request::routeIs('payment_methods.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Payment Method List</a></li>
-                <li><a href="{{ route('payment_methods.create') }}" class="{{ Request::routeIs('payment_methods.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Payment Method</a></li>
+                <li><a href="{{ route('payment_methods.index') }}"
+                        class="{{ Request::routeIs('payment_methods.index') ? 'active' : '' }}"><i
+                            class="fas fa-list"></i> Payment Method List</a></li>
+                <li><a href="{{ route('payment_methods.create') }}"
+                        class="{{ Request::routeIs('payment_methods.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Payment Method</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('attendances.*') ? 'main-active' : '' }}">
@@ -190,8 +217,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('attendances.index') }}" class="{{ Request::routeIs('attendances.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Attendance List</a></li>
-                <li><a href="{{ route('attendances.toggle') }}" class="{{ Request::routeIs('attendances.toggle') ? 'active' : '' }}"><i class="fas fa-clock"></i> Attendance Toggle</a></li>
+                <li><a href="{{ route('attendances.index') }}"
+                        class="{{ Request::routeIs('attendances.index') ? 'active' : '' }}"><i
+                            class="fas fa-list"></i> Attendance List</a></li>
+                <li><a href="{{ route('attendances.toggle') }}"
+                        class="{{ Request::routeIs('attendances.toggle') ? 'active' : '' }}"><i
+                            class="fas fa-clock"></i> Attendance Toggle</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('positions.*') ? 'main-active' : '' }}">
@@ -200,8 +231,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('positions.index') }}" class="{{ Request::routeIs('positions.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Position List</a></li>
-                <li><a href="{{ route('positions.create') }}" class="{{ Request::routeIs('positions.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Position</a></li>
+                <li><a href="{{ route('positions.index') }}"
+                        class="{{ Request::routeIs('positions.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Position List</a></li>
+                <li><a href="{{ route('positions.create') }}"
+                        class="{{ Request::routeIs('positions.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Position</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('departments.*') ? 'main-active' : '' }}">
@@ -210,8 +245,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('departments.index') }}" class="{{ Request::routeIs('departments.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Department List</a></li>
-                <li><a href="{{ route('departments.create') }}" class="{{ Request::routeIs('departments.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Department</a></li>
+                <li><a href="{{ route('departments.index') }}"
+                        class="{{ Request::routeIs('departments.index') ? 'active' : '' }}"><i
+                            class="fas fa-list"></i> Department List</a></li>
+                <li><a href="{{ route('departments.create') }}"
+                        class="{{ Request::routeIs('departments.create') ? 'active' : '' }}"><i
+                            class="fas fa-plus"></i> Add Department</a></li>
             </ul>
         </li>
         <li class="{{ Request::routeIs('roles.*') ? 'main-active' : '' }}">
@@ -220,8 +259,12 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('roles.index') }}" class="{{ Request::routeIs('roles.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Role List</a></li>
-                <li><a href="{{ route('roles.create') }}" class="{{ Request::routeIs('roles.create') ? 'active' : '' }}"><i class="fas fa-plus"></i> Add Role</a></li>
+                <li><a href="{{ route('roles.index') }}"
+                        class="{{ Request::routeIs('roles.index') ? 'active' : '' }}"><i class="fas fa-list"></i>
+                        Role List</a></li>
+                <li><a href="{{ route('roles.create') }}"
+                        class="{{ Request::routeIs('roles.create') ? 'active' : '' }}"><i class="fas fa-plus"></i>
+                        Add Role</a></li>
             </ul>
         </li>
         @can('manage-permissions')
@@ -231,8 +274,12 @@
                     <i class="fas fa-chevron-down dropdown-icon"></i>
                 </a>
                 <ul class="submenu">
-                    <li><a href="{{ route('permissions.index') }}" class="{{ Request::routeIs('permissions.index') ? 'active' : '' }}"><i class="fas fa-list"></i> Permission List</a></li>
-                    <li><a href="{{ route('permissions.assign') }}" class="{{ Request::routeIs('permissions.assign') ? 'active' : '' }}"><i class="fas fa-plus"></i> Assign Permission</a></li>
+                    <li><a href="{{ route('permissions.index') }}"
+                            class="{{ Request::routeIs('permissions.index') ? 'active' : '' }}"><i
+                                class="fas fa-list"></i> Permission List</a></li>
+                    <li><a href="{{ route('permissions.assign') }}"
+                            class="{{ Request::routeIs('permissions.assign') ? 'active' : '' }}"><i
+                                class="fas fa-plus"></i> Assign Permission</a></li>
                 </ul>
             </li>
         @endcan
@@ -242,14 +289,16 @@
                 <i class="fas fa-chevron-down dropdown-icon"></i>
             </a>
             <ul class="submenu">
-                <li><a href="{{ route('profile.edit') }}" class="{{ Request::routeIs('profile.edit') ? 'active' : '' }}"><i class="fas fa-edit"></i> Edit Profile</a></li>
+                <li><a href="{{ route('profile.edit') }}"
+                        class="{{ Request::routeIs('profile.edit') ? 'active' : '' }}"><i class="fas fa-edit"></i>
+                        Edit Profile</a></li>
             </ul>
         </li>
     </ul>
 </aside>
 
 <style>
-   /* Sidebar Styles */
+    /* Sidebar Styles */
     .sidebar {
         width: 250px;
         background: linear-gradient(135deg, #333 0%, #222 100%);
@@ -259,9 +308,14 @@
         top: 0;
         left: 0;
         transition: transform 0.4s cubic-bezier(0.215, 0.61, 0.355, 1);
-        z-index: 2000; /* Match mobile z-index */
+        z-index: 2000;
         transform: translateX(-100%);
         overflow-y: auto;
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .sidebar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
     }
 
     .sidebar.expanded {
@@ -273,7 +327,7 @@
         font-size: 1.5rem;
         font-weight: bold;
         text-align: center;
-        z-index: 2001; /* Above sidebar */
+        z-index: 2001;
     }
 
     .sidebar ul {
@@ -288,13 +342,13 @@
         text-decoration: none;
         transition: background 0.3s ease;
         position: relative;
-        z-index: 2001; /* Ensure links are clickable */
+        z-index: 2001;
         pointer-events: auto;
     }
 
     .sidebar ul li.main-active {
-        background: rgba(255, 255, 255, 0.05); /* Subtle background */
-        border-left: 3px solid #4caf50; /* Green border */
+        background: rgba(255, 255, 255, 0.05);
+        border-left: 3px solid #4caf50;
     }
 
     .sidebar ul li a.active {
@@ -326,9 +380,15 @@
         opacity: 0;
         transform: translateY(-10px);
         transition: max-height 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-                    opacity 0.3s ease,
-                    transform 0.3s ease;
-        z-index: 2001; /* Ensure submenu is above overlay */
+            opacity 0.3s ease,
+            transform 0.3s ease;
+        z-index: 2001;
+        /* Hide scrollbar on submenu if content grows */
+        scrollbar-width: none; /* Firefox */
+    }
+
+    .submenu::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
     }
 
     .sidebar ul li.open .submenu {

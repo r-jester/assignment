@@ -2,9 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
-use App\Models\Tenant;
-use App\Models\Business;
 use App\Models\Employee;
 use App\Models\Position;
 use App\Models\Department;
@@ -14,6 +11,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role as SpatieRole;
+use Faker\Factory as Faker;
 
 class DatabaseSeeder extends Seeder
 {
@@ -21,22 +19,18 @@ class DatabaseSeeder extends Seeder
 
     protected function getModules()
     {
-        $controllersPath = app_path('Http/Controllers');
+        $viewsPath = resource_path('views');
         $modules = [];
 
-        $files = File::files($controllersPath);
-        foreach ($files as $file) {
-            $filename = $file->getFilenameWithoutExtension();
-            if (str_ends_with($filename, 'Controller')) {
-                $moduleName = str_replace('Controller', '', $filename);
-                $moduleName = strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $moduleName));
-                $moduleName = Str::plural($moduleName);
+        $directories = File::directories($viewsPath);
+        foreach ($directories as $directory) {
+            $moduleName = basename($directory);
+            if ($moduleName !== 'layouts' && $moduleName !== 'components' && $moduleName !== 'auth') {
                 $modules[] = $moduleName;
             }
         }
 
         $modules = array_unique(array_merge($modules, ['permissions']));
-
         return $modules;
     }
 
@@ -55,12 +49,13 @@ class DatabaseSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission, 'guard_name' => 'web']);
         }
 
-        $superAdminRole = SpatieRole::firstOrCreate(['name' => 'super-admin', 'guard_name' => 'web']);
+        $superAdminRole = SpatieRole::firstOrCreate(['name' => 'superadmin', 'guard_name' => 'web']);
         $superAdminRole->syncPermissions(Permission::all());
 
         $adminRole = SpatieRole::firstOrCreate(['name' => 'admin', 'guard_name' => 'web']);
         $staffRole = SpatieRole::firstOrCreate(['name' => 'staff', 'guard_name' => 'web']);
         $internRole = SpatieRole::firstOrCreate(['name' => 'intern', 'guard_name' => 'web']);
+        $userRole = SpatieRole::firstOrCreate(['name' => 'user', 'guard_name' => 'web']);
 
         $adminPermissions = ['manage-permissions'];
         foreach ($modules as $module) {
@@ -76,41 +71,11 @@ class DatabaseSeeder extends Seeder
         }
         $staffRole->syncPermissions($staffPermissions);
         $internRole->syncPermissions($staffPermissions);
-
-        $tenant = Tenant::firstOrCreate(
-            ['name' => 'Default Tenant'],
-            [
-                'address' => '123 Main St',
-                'city' => 'New York',
-                'state' => 'NY',
-                'zip' => '10001',
-                'country' => 'USA',
-                'phone' => '123-456-7890',
-                'email' => 'contact@defaulttenant.com',
-                'website' => 'https://defaulttenant.com',
-            ]
-        );
-
-        $business = Business::firstOrCreate(
-            ['name' => 'Default Business', 'tenant_id' => $tenant->id],
-            [
-                'tenant_id' => $tenant->id,
-                'address' => '123 Business St',
-                'city' => 'New York',
-                'state' => 'NY',
-                'zip' => '10001',
-                'country' => 'USA',
-                'phone' => '123-456-7890',
-                'email' => 'contact@defaultbusiness.com',
-                'website' => 'https://defaultbusiness.com',
-            ]
-        );
+        $userRole->syncPermissions($staffPermissions);
 
         $position = Position::firstOrCreate(
             ['name' => 'Super Admin'],
             [
-                'tenant_id' => $tenant->id,
-                'business_id' => $business->id,
                 'description' => 'System Super Administrator'
             ]
         );
@@ -118,65 +83,86 @@ class DatabaseSeeder extends Seeder
         $department = Department::firstOrCreate(
             ['name' => 'Administration'],
             [
-                'tenant_id' => $tenant->id,
-                'business_id' => $business->id,
                 'description' => 'System Administration'
             ]
         );
 
-        $role = Role::firstOrCreate(
-            ['name' => 'Super Admin'],
-            [
-                'guard_name' => 'web',
-                'description' => 'Has access to all system functions'
-            ]
-        );
+        // Ensure existing employees are deleted to control IDs
+        Employee::truncate();
 
-        $employee = Employee::firstOrCreate(
-            [
-                // 'tenant_id' => 1,
-                // 'business_id' => 1,
-                'department_id' => 1,
-                'position_id' => 1,
-                'role_id' => 5,
-                'username' => 'jester',
-                'password' => Hash::make('Jester'),
-                'first_name' => 'Super',
-                'last_name' => 'Jester',
-                'email' => 'superjester@fake.com',
-                'phone' => '1234567890',
-                'hire_date' => now(),
-                'salary' => 100000,
-                'status' => 'active',
-                'image' => 'uploads/employees/default.jpg'
-            ]
-        );
-        $employee = Employee::firstOrCreate(
-            [
-                // 'tenant_id' => 1,
-                // 'business_id' => 1,
-                'department_id' => 1,
-                'position_id' => 1,
-                'role_id' => 5,
-                'username' => 'admin',
-                'password' => Hash::make('admin'),
-                'first_name' => 'Super',
-                'last_name' => 'admin',
-                'email' => 'superadmin@fake.com',
-                'phone' => '12345678',
-                'hire_date' => now(),
-                'salary' => 100000,
-                'status' => 'active',
-                'image' => 'uploads/employees/default.jpg'
-            ]
-        );
+        // Superadmin with ID 1
+        $employee1 = Employee::create([
+            'id' => 1,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'username' => 'jester',
+            'password' => Hash::make('Jester'),
+            'first_name' => 'Super',
+            'last_name' => 'Jester',
+            'email' => 'superjester@fake.com',
+            'phone' => '1234567890',
+            'hire_date' => now()->timezone('Asia/Phnom_Penh')->format('Y-m-d'),
+            'salary' => 100000,
+            'status' => 'active',
+            'image' => 'employees/MacBookProM5Pro.jpeg',
+        ]);
+        $employee1->syncRoles(['superadmin']);
 
-        $employee->assignRole('super-admin');
+        // Admin with ID 2
+        $employee2 = Employee::create([
+            'id' => 2,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'username' => 'admin',
+            'password' => Hash::make('admin'),
+            'first_name' => 'Super',
+            'last_name' => 'Admin',
+            'email' => 'superadmin@fake.com',
+            'phone' => '12345678',
+            'hire_date' => now()->timezone('Asia/Phnom_Penh')->format('Y-m-d'),
+            'salary' => 100000,
+            'status' => 'active',
+            'image' => 'employees/MacBookProM5Pro.jpeg'
+        ]);
+        $employee2->syncRoles(['admin']);
+
+        // User with ID 3
+        $employee3 = Employee::create([
+            'id' => 3,
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'username' => 'user',
+            'password' => Hash::make('user'),
+            'first_name' => 'User',
+            'last_name' => 'Normal',
+            'email' => 'superuser@fake.com',
+            'phone' => '1234567891',
+            'hire_date' => now()->timezone('Asia/Phnom_Penh')->format('Y-m-d'),
+            'salary' => 50000,
+            'status' => 'active',
+            'image' => 'employees/MacBookProM5Pro.jpeg'
+        ]);
+        $employee3->syncRoles(['user']);
+
+        // Create a random user
+        $faker = Faker::create();
+        $randomEmployee = Employee::create([
+            'department_id' => $department->id,
+            'position_id' => $position->id,
+            'username' => $faker->unique()->userName,
+            'password' => Hash::make('password'),
+            'first_name' => $faker->firstName,
+            'last_name' => $faker->lastName,
+            'email' => $faker->unique()->safeEmail,
+            'phone' => $faker->phoneNumber,
+            'hire_date' => now()->timezone('Asia/Phnom_Penh')->format('Y-m-d'),
+            'salary' => $faker->numberBetween(30000, 80000),
+            'status' => 'active',
+            'image' => 'Uploads/employees/default.jpg'
+        ]);
+        $randomEmployee->syncRoles(['user']);
 
         $this->call([
-            TenantSeeder::class,
-            BusinessSeeder::class,
-            BusinessLocationSeeder::class,
             CategorySeeder::class,
             ProductSeeder::class,
             SalesSummarySeeder::class,
@@ -197,3 +183,11 @@ class DatabaseSeeder extends Seeder
         ]);
     }
 }
+
+/*
+ * To ensure the correct timezone, set the 'timezone' in config/app.php:
+ * 'timezone' => 'Asia/Phnom_Penh',
+ * After updating, clear the config cache:
+ * php artisan config:clear
+ * Verify the server timezone (e.g., on Linux: `timedatectl`) is set to Asia/Phnom_Penh or UTC+07:00.
+ */

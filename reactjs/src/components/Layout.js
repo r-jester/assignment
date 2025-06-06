@@ -1,109 +1,67 @@
-
-import React, { useState, useEffect } from "react"; // Combine imports
-import { Outlet, useNavigate } from "react-router-dom"; // Import useNavigate
-import Header from "./shared/Header";
+import React, { useEffect, useState } from "react";
+import { Outlet } from "react-router-dom";
 import Sidebar from "./shared/Sidebar";
+import Header from "./shared/Header";
 import Footer from "./shared/Footer";
+import api from "../services/api";
 
-function Layout() {
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+const Layout = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [username, setUsername] = useState("");
 
-  const toggleSidebar = () => {
-    setIsSidebarCollapsed(!isSidebarCollapsed);
-  };
+  useEffect(() => {
+    const user = JSON.parse(localStorage.getItem("user"));
+    if (user && user.id) {
+      api
+        .get(`/users/${user.id}`)
+        .then((res) => {
+          setUsername(res.data.username || user.username || "User");
+        })
+        .catch((error) => {
+          console.error("Error fetching user data:", error);
+          setUsername(user.username || "User");
+        });
+    } else {
+      setUsername("Guest");
+    }
+  }, []);
 
   return (
-    <div style={styles.layout}>
-      {/* Header */}
-      <header style={styles.header}>
+    <div style={{ display: "flex", minHeight: "100vh" }}>
+      <Sidebar isCollapsed={!sidebarOpen} username={username} />
+
+      <div
+        style={{
+          marginLeft: sidebarOpen ? 250 : 0,
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+          transition: "margin-left 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)",
+          backgroundColor: "#f3f4f6",
+          minHeight: "100vh",
+          overflowX: "hidden",
+        }}
+      >
         <Header
-          toggleSidebar={toggleSidebar}
-          isSidebarCollapsed={isSidebarCollapsed}
+          toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+          username={username}
         />
-      </header>
 
-      {/* Main Content Area */}
-      <div style={styles.mainContent}>
-        {/* Sidebar */}
-        <aside
-          style={{
-            ...styles.sidebar,
-            width: isSidebarCollapsed ? "0" : "250px",
-            overflow: isSidebarCollapsed ? "hidden" : "auto",
-          }}
-        >
-          <Sidebar isCollapsed={isSidebarCollapsed} />
-        </aside>
-
-        {/* Main Content */}
         <main
           style={{
-            ...styles.content,
-            marginLeft: isSidebarCollapsed ? "0" : "250px",
+            flexGrow: 1,
+            padding: 25,
+            overflowY: "auto",
+            minHeight: 0,
           }}
         >
-          <Outlet /> {/* Nested routes will be rendered here */}
+          <Outlet />
         </main>
-      </div>
 
-      {/* Footer */}
-      <footer style={styles.footer}>
-        <Footer />
-      </footer>
+        <Footer username={username} />
+      </div>
     </div>
   );
-}
+};
 
 export default Layout;
-
-const styles = {
-  layout: {
-    display: "flex",
-    flexDirection: "column",
-    minHeight: "100vh",
-  },
-  header: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    backgroundColor: "#282c34",
-    color: "white",
-    padding: "5px 20px",
-  },
-  mainContent: {
-    display: "flex",
-    flex: 1,
-    marginTop: "60px", // Adjust based on header height
-    marginBottom: "60px", // Adjust based on footer height
-  },
-  sidebar: {
-    position: "fixed",
-    top: "60px", // Adjust based on header height
-    left: 0,
-    bottom: "60px", // Adjust based on footer height
-    backgroundColor: "#2c3e50",
-    color: "white",
-    padding: "20px",
-    transition: "width 0.3s ease, overflow 0.3s ease",
-  },
-  content: {
-    flex: 1,
-    padding: "20px",
-    overflowY: "auto",
-    transition: "margin-left 0.3s ease",
-  },
-  footer: {
-    position: "fixed",
-    bottom: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-    minHeight: "70px",
-    backgroundColor: "#282c34",
-    color: "white",
-    padding: "10px 20px",
-    textAlign: "center",
-  },
-};

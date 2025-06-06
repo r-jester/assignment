@@ -4,8 +4,6 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Payment Method Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            <p><strong>Tenant:</strong> {{ $paymentMethod->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $paymentMethod->business->name }}</p>
             <p><strong>Name:</strong> {{ $paymentMethod->name }}</p>
             <p><strong>Active:</strong> {{ $paymentMethod->is_active ? 'Yes' : 'No' }}</p>
             <div class="mt-4">

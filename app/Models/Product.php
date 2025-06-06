@@ -13,17 +13,7 @@ class Product extends Model
         'category_id', 'name', 'description',
         'price', 'stock_quantity', 'sku', 'barcode', 'image'
     ];
-
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
-    // }
-
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
-
+    
     public function category()
     {
         return $this->belongsTo(Category::class);

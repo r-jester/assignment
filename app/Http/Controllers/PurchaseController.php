@@ -45,9 +45,6 @@ class PurchaseController extends Controller
         }
 
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'business_id' => 'required|exists:businesses,id',
-            'location_id' => 'required|exists:business_locations,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
@@ -68,9 +65,6 @@ class PurchaseController extends Controller
             $invoiceNumber = 'PUR-' . str_pad(($latestPurchase ? $latestPurchase->id + 1 : 1), 6, '0', STR_PAD_LEFT);
 
             $purchase = Purchase::create([
-                'tenant_id' => $validated['tenant_id'],
-                'business_id' => $validated['business_id'],
-                'location_id' => $validated['location_id'],
                 'supplier_id' => $validated['supplier_id'],
                 'user_id' => $validated['user_id'],
                 'invoice_number' => $invoiceNumber,
@@ -110,9 +104,6 @@ class PurchaseController extends Controller
                 // Update or create InventorySummary
                 $inventorySummary = InventorySummary::updateOrCreate(
                     [
-                        'tenant_id' => $validated['tenant_id'],
-                        'business_id' => $validated['business_id'],
-                        'location_id' => $validated['location_id'],
                         'product_id' => $item['product_id'],
                     ],
                     [
@@ -166,9 +157,6 @@ class PurchaseController extends Controller
         }
 
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'business_id' => 'required|exists:businesses,id',
-            'location_id' => 'required|exists:business_locations,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
@@ -189,9 +177,6 @@ class PurchaseController extends Controller
 
                 // Update InventorySummary
                 $inventorySummary = InventorySummary::where([
-                    'tenant_id' => $purchase->tenant_id,
-                    'business_id' => $purchase->business_id,
-                    'location_id' => $purchase->location_id,
                     'product_id' => $item->product_id,
                 ])->first();
                 if ($inventorySummary) {
@@ -250,9 +235,6 @@ class PurchaseController extends Controller
                 // Update or create InventorySummary
                 $inventorySummary = InventorySummary::updateOrCreate(
                     [
-                        'tenant_id' => $validated['tenant_id'],
-                        'business_id' => $validated['business_id'],
-                        'location_id' => $validated['location_id'],
                         'product_id' => $item['product_id'],
                     ],
                     [
@@ -263,9 +245,6 @@ class PurchaseController extends Controller
             }
 
             $purchase->update([
-                'tenant_id' => $validated['tenant_id'],
-                'business_id' => $validated['business_id'],
-                'location_id' => $validated['location_id'],
                 'supplier_id' => $validated['supplier_id'],
                 'user_id' => $validated['user_id'],
                 'status' => $validated['status'],
@@ -296,9 +275,6 @@ class PurchaseController extends Controller
 
                 // Update InventorySummary
                 $inventorySummary = InventorySummary::where([
-                    'tenant_id' => $purchase->tenant_id,
-                    'business_id' => $purchase->business_id,
-                    'location_id' => $purchase->location_id,
                     'product_id' => $item->product_id,
                 ])->first();
                 if ($inventorySummary) {

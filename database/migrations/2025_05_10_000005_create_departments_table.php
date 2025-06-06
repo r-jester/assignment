@@ -11,8 +11,6 @@ return new class extends Migration
         Schema::create('departments', function (Blueprint $table) {
             $table->id();
             $table->string('name')->unique();
-            $table->unsignedBigInteger('tenant_id')->nullable();
-            $table->unsignedBigInteger('business_id')->nullable();
             $table->text('description')->nullable();
             $table->timestamps();
         });

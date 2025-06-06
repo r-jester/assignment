@@ -4,9 +4,6 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Sale Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            <p><strong>Tenant:</strong> {{ $sale->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $sale->business->name }}</p>
-            <p><strong>Location:</strong> {{ $sale->location->name }}</p>
             <p><strong>Customer:</strong> {{ $sale->customer ? $sale->customer->first_name . ' ' . $sale->customer->last_name : 'N/A' }}</p>
             <p><strong>Employee:</strong> {{ $sale->user->first_name }} {{ $sale->user->last_name }}</p>
             <p><strong>Total Amount:</strong> {{ $sale->total_amount }}</p>

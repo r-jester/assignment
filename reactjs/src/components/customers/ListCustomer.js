@@ -1,15 +1,33 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 
 function ListCustomer({ customerList: initialCustomers = [], onUpdateCustomerList }) {
   const [editingCustomer, setEditingCustomer] = useState(null); // State to track the customer being edited
   const [isModalOpen, setIsModalOpen] = useState(false); // State to control modal visibility
 
-  useEffect(() => {
-    // Sync customerList rows with the DOM on initial render
-    renderCustomerRows(initialCustomers);
-  }, [initialCustomers]);
+  const handleDeleteRow = useCallback((row) => {
+    const confirmDelete = window.confirm('Are you sure you want to delete this customer?');
+    if (confirmDelete) {
+      const tableBody = document.getElementById('customer-table-body');
+      const rowId = row.getAttribute('data-id');
 
-  const renderCustomerRows = (customers) => {
+      // Remove the row from the DOM
+      tableBody.removeChild(row);
+
+      // Update the parent component if needed
+      const updatedList = initialCustomers.filter((customer) => customer.id !== rowId);
+      if (typeof onUpdateCustomerList === 'function') {
+        onUpdateCustomerList(updatedList);
+      }
+    }
+  }, [initialCustomers, onUpdateCustomerList]);
+
+  const handleEditRow = useCallback((customer) => {
+    // Set the customer being edited and open the modal
+    setEditingCustomer(customer);
+    setIsModalOpen(true);
+  }, []);
+
+  const renderCustomerRows = useCallback((customers) => {
     const tableBody = document.getElementById('customer-table-body');
     if (!tableBody) return;
 
@@ -50,30 +68,14 @@ function ListCustomer({ customerList: initialCustomers = [], onUpdateCustomerLis
       // Append the row to the table body
       tableBody.appendChild(row);
     });
-  };
+  }, [handleDeleteRow, handleEditRow]);
 
-  const handleDeleteRow = (row) => {
-    const confirmDelete = window.confirm('Are you sure you want to delete this customer?');
-    if (confirmDelete) {
-      const tableBody = document.getElementById('customer-table-body');
-      const rowId = row.getAttribute('data-id');
+  useEffect(() => {
+    // Sync customerList rows with the DOM on initial render
+    renderCustomerRows(initialCustomers);
+  }, [initialCustomers, renderCustomerRows]);
 
-      // Remove the row from the DOM
-      tableBody.removeChild(row);
 
-      // Update the parent component if needed
-      const updatedList = initialCustomers.filter((customer) => customer.id !== rowId);
-      if (typeof onUpdateCustomerList === 'function') {
-        onUpdateCustomerList(updatedList);
-      }
-    }
-  };
-
-  const handleEditRow = (customer) => {
-    // Set the customer being edited and open the modal
-    setEditingCustomer(customer);
-    setIsModalOpen(true);
-  };
 
   const handleSaveEdit = () => {
     if (editingCustomer) {

@@ -12,14 +12,5 @@ class TaxRate extends Model
     protected $fillable = [
         'name', 'rate'
     ];
-
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
-    // }
-
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
+    
 }

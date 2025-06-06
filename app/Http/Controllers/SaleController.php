@@ -4,9 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Sale;
 use App\Models\SaleItem;
-use App\Models\Tenant;
-use App\Models\Business;
-use App\Models\BusinessLocation;
 use App\Models\Customer;
 use App\Models\Employee;
 use App\Models\Product;
@@ -24,7 +21,7 @@ class SaleController extends Controller
             throw UnauthorizedException::forPermissions(['view-sales']);
         }
 
-        $sales = Sale::with(['tenant', 'business', 'customer'])->paginate(10);
+        $sales = Sale::with(['customer'])->paginate(10);
         return view('sales.index', compact('sales'));
     }
 
@@ -34,15 +31,12 @@ class SaleController extends Controller
             throw UnauthorizedException::forPermissions(['create-sales']);
         }
 
-        $tenants = Tenant::all();
-        $businesses = Business::all();
-        $locations = BusinessLocation::all();
         $customers = Customer::all();
         $employees = Employee::all();
         $products = Product::all();
         $taxRates = TaxRate::all();
 
-        return view('sales.create', compact('tenants', 'businesses', 'locations', 'customers', 'employees', 'products', 'taxRates'));
+        return view('sales.create', compact('customers', 'employees', 'products', 'taxRates'));
     }
 
     public function store(Request $request)
@@ -52,9 +46,6 @@ class SaleController extends Controller
         }
 
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'business_id' => 'required|exists:businesses,id',
-            'location_id' => 'required|exists:business_locations,id',
             'customer_id' => 'nullable|exists:customers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
@@ -91,12 +82,9 @@ class SaleController extends Controller
 
             // Generate invoice number
             $latestSale = Sale::latest()->first();
-            $invoiceNumber = 'INV-' . str_pad(($latestSale ? $latestSale->id + 1 : 1), 6, '0', STR_PAD_LEFT);
+            $invoiceNumber = 'INV-' . str_pad(($latestSale ? $latestSale->id + 1 : 1), 4, '0', STR_PAD_LEFT);
 
             $sale = Sale::create([
-                'tenant_id' => $validated['tenant_id'],
-                'business_id' => $validated['business_id'],
-                'location_id' => $validated['location_id'],
                 'customer_id' => $validated['customer_id'],
                 'user_id' => $validated['user_id'],
                 'invoice_number' => $invoiceNumber,
@@ -127,15 +115,12 @@ class SaleController extends Controller
                 $product->decrement('stock_quantity', $quantity);
 
                 // Update or create InventorySummary
-                $inventorySummary = InventorySummary::updateOrCreate(
+                InventorySummary::updateOrCreate(
                     [
-                        'tenant_id' => $validated['tenant_id'],
-                        'business_id' => $validated['business_id'],
-                        'location_id' => $validated['location_id'],
                         'product_id' => $item['product_id'],
                     ],
                     [
-                        'stock_quantity' => $product->stock_quantity - $quantity,
+                        'stock_quantity' => $product->stock_quantity,
                         'last_updated' => now(),
                     ]
                 );
@@ -155,7 +140,7 @@ class SaleController extends Controller
             throw UnauthorizedException::forPermissions(['view-sales']);
         }
 
-        $sale->load('saleItems.product', 'saleItems.taxRate', 'tenant', 'business', 'location', 'customer', 'user');
+        $sale->load('saleItems.product', 'saleItems.taxRate', 'customer', 'user');
         return view('sales.show', compact('sale'));
     }
 
@@ -166,15 +151,12 @@ class SaleController extends Controller
         }
 
         $sale->load('saleItems.product', 'saleItems.taxRate');
-        $tenants = Tenant::all();
-        $businesses = Business::all();
-        $locations = BusinessLocation::all();
         $customers = Customer::all();
         $employees = Employee::all();
         $products = Product::all();
         $taxRates = TaxRate::all();
 
-        return view('sales.edit', compact('sale', 'tenants', 'businesses', 'locations', 'customers', 'employees', 'products', 'taxRates'));
+        return view('sales.edit', compact('sale', 'customers', 'employees', 'products', 'taxRates'));
     }
 
     public function update(Request $request, Sale $sale)
@@ -184,9 +166,6 @@ class SaleController extends Controller
         }
 
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
-            'business_id' => 'required|exists:businesses,id',
-            'location_id' => 'required|exists:business_locations,id',
             'customer_id' => 'nullable|exists:customers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
@@ -206,9 +185,6 @@ class SaleController extends Controller
 
                 // Update InventorySummary
                 $inventorySummary = InventorySummary::where([
-                    'tenant_id' => $sale->tenant_id,
-                    'business_id' => $sale->business_id,
-                    'location_id' => $sale->location_id,
                     'product_id' => $saleItem->product_id,
                 ])->first();
                 if ($inventorySummary) {
@@ -243,9 +219,6 @@ class SaleController extends Controller
             }
 
             $sale->update([
-                'tenant_id' => $validated['tenant_id'],
-                'business_id' => $validated['business_id'],
-                'location_id' => $validated['location_id'],
                 'customer_id' => $validated['customer_id'],
                 'user_id' => $validated['user_id'],
                 'status' => $validated['status'],
@@ -289,11 +262,8 @@ class SaleController extends Controller
                 $product->decrement('stock_quantity', $quantity);
 
                 // Update or create InventorySummary
-                $inventorySummary = InventorySummary::updateOrCreate(
+                InventorySummary::updateOrCreate(
                     [
-                        'tenant_id' => $validated['tenant_id'],
-                        'business_id' => $validated['business_id'],
-                        'location_id' => $validated['location_id'],
                         'product_id' => $item['product_id'],
                     ],
                     [
@@ -326,9 +296,6 @@ class SaleController extends Controller
 
                 // Update InventorySummary
                 $inventorySummary = InventorySummary::where([
-                    'tenant_id' => $sale->tenant_id,
-                    'business_id' => $sale->business_id,
-                    'location_id' => $sale->location_id,
                     'product_id' => $saleItem->product_id,
                 ])->first();
                 if ($inventorySummary) {

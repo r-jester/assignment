@@ -11,16 +11,6 @@ class Category extends Model
 
     protected $fillable = ['name', 'description'];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class);
-    // }
-
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
-
     public function products()
     {
         return $this->hasMany(Product::class);

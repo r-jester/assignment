@@ -6,33 +6,6 @@
         <form action="{{ route('expenses.update', $expense) }}" method="POST">
             @csrf
             @method('PUT')
-            {{-- <div class="mb-4">
-                <label class="block text-sm font-medium">Tenant</label>
-                <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
-                    @foreach ($tenants as $tenant)
-                        <option value="{{ $tenant->id }}" {{ $expense->tenant_id == $tenant->id ? 'selected' : '' }}>{{ $tenant->name }}</option>
-                    @endforeach
-                </select>
-                @error('tenant_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium">Business</label>
-                <select name="business_id" class="mt-1 block w-full border rounded p-2">
-                    @foreach ($businesses as $business)
-                        <option value="{{ $business->id }}" {{ $expense->business_id == $business->id ? 'selected' : '' }}>{{ $business->name }}</option>
-                    @endforeach
-                </select>
-                @error('business_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div>
-            <div class="mb-4">
-                <label class="block text-sm font-medium">Location</label>
-                <select name="location_id" class="mt-1 block w-full border rounded p-2">
-                    @foreach ($locations as $location)
-                        <option value="{{ $location->id }}" {{ $expense->location_id == $location->id ? 'selected' : '' }}>{{ $location->name }}</option>
-                    @endforeach
-                </select>
-                @error('location_id') <span class="text-red-500">{{ $message }}</span> @enderror
-            </div> --}}
             <div class="mb-4">
                 <label class="block text-sm font-medium">Employee</label>
                 <select name="user_id" class="mt-1 block w-full border rounded p-2">

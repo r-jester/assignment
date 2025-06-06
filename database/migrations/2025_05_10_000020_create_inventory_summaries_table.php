@@ -10,17 +10,11 @@ class CreateInventorySummariesTable extends Migration
     {
         Schema::create('inventory_summaries', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedBigInteger('tenant_id');
-            $table->unsignedBigInteger('business_id');
-            $table->unsignedBigInteger('location_id');
             $table->unsignedBigInteger('product_id');
             $table->integer('stock_quantity');
             $table->timestamp('last_updated');
             $table->timestamps();
 
-            $table->foreign('tenant_id')->references('id')->on('tenants')->onDelete('cascade');
-            $table->foreign('business_id')->references('id')->on('businesses')->onDelete('cascade');
-            $table->foreign('location_id')->references('id')->on('business_locations')->onDelete('restrict');
             $table->foreign('product_id')->references('id')->on('products')->onDelete('restrict');
         });
     }

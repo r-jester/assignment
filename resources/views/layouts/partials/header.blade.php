@@ -5,28 +5,43 @@
             aria-controls="sidebar">
             <i class="fas fa-bars"></i>
         </button>
-        <a class="text-white text-decoration-none" title="home" href="{{ url('/') }}"> {{ session()->get('NAME', 'Guest') }} Syst</a>
+        <a class="text-white text-decoration-none" title="home" href="{{ url('/') }}">
+            {{ auth()->user()->username }} Syst</a>
     </div>
     <div class="d-flex align-items-center gap-3 position-relative">
         <a class="text-white" title="home" href="{{ url('/') }}"><i class="fas fa-home d-block"></i></a>
-        {{-- <i class="fas fa-bell"></i> --}}
-        <a class="text-white" title="users" href="/users"><i class="fas fa-users d-block"></i></a>
-        {{-- <i class="fas fa-envelope"></i> --}}
-        <a class="text-white" title="products" href="/products"><i class="fas fa-shop d-block"></i></a>
-        <a class="text-white" title="categories" href="/categories"><i class="fas fa-box d-block"></i></a>
+        <i class="fas fa-bell"></i>
+        <a class="text-white" title="employees" href="{{ route('employees.index') }}"><i class="fas fa-users d-block"></i></a>
+        <a class="text-white" title="roles" href="{{ route('roles.index') }}"><i class="fas fa-user-shield"></i></a>
+        <a class="text-white" title="attendances" href="{{ route('attendances.index') }}"><i class="fas fa-calendar-alt"></i></a>
+        @if (session('impersonating') && session('original_user_id'))
+            <a class="text-white" title="Back to Superadmin" href="{{ route('stop-impersonating') }}">
+                <i class="fa-solid fa-door-open"></i>
+            </a>
+        @endif    
         <i class="fas fa-user text-white cursor-pointer" id="profilePopup" title="profile"></i>
 
         <!-- Modal Profile -->
         <div class="modalProfile position-absolute bg-white rounded shadow-lg"
             style="width: 240px; top: 40px; right: 0; display: none; z-index: 2010;">
             <!-- Profile Header -->
-            <div class="bg-primary bg-gradient text-center py-3">
-                <i class="fas fa-user-circle text-white fs-1"></i>
+            <div class="bg-primary bg-gradient d-flex justify-content-center py-2">
+                @php $user = Auth::user(); @endphp
+
+                @if ($user && $user->image && Storage::disk('public')->exists($user->image))
+                    <a href="{{ Storage::url($user->image) }}" target="_blank">
+                        <img src="{{ Storage::url($user->image) }}" alt="Profile Image"
+                            class="w-16 h-16 rounded-full object-cover border border-white">
+                    </a>
+                @else
+                    <i class="fas fa-user-circle text-black text-6xl"></i>
+                @endif
             </div>
 
             <!-- Profile Content -->
-            <div class="p-3">
-                <h2 class="d-block text-center mb-3 text-success font-extrabold text-4xl">{{ session()->get('NAME') }}
+            <div class="p-1">
+                <h2 class="d-block text-center mb-1 text-success font-extrabold text-2xl">{{ auth()->user()->username }} <br />
+                    <small class="text-[14px]">{{ auth()->user()->email }}</small>
                 </h2>
 
                 <!-- Profile Actions -->
@@ -42,7 +57,8 @@
                 <!-- Logout Button -->
                 <form action="{{ route('logout') }}" method="POST" class="w-100">
                     @csrf
-                    <button type="submit" class="btn btn-danger w-100 d-flex align-items-center justify-content-center">
+                    <button type="submit"
+                        class="btn btn-danger w-100 d-flex align-items-center justify-content-center">
                         <i class="fas fa-sign-out-alt me-2"></i> Log Out
                     </button>
                 </form>

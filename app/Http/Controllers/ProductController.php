@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
-use App\Models\Tenant;
-use App\Models\Business;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -13,15 +11,12 @@ class ProductController extends Controller
 {
     public function index()
     {
-        // $products = Product::with(['tenant', 'business', 'category'])->paginate(10);
         $products = Product::with('category')->paginate(10);
         return view('products.index', compact('products'));
     }
 
     public function create()
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
         $categories = Category::all();
         return view('products.create', compact('categories'));
     }
@@ -29,8 +24,6 @@ class ProductController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -52,15 +45,12 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-        // $product->load(['tenant', 'business', 'category']);
         $product->load('category');
         return view('products.show', compact('product'));
     }
 
     public function edit(Product $product)
     {
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
         $categories = Category::all();
         return view('products.edit', compact('product', 'categories'));
     }
@@ -68,8 +58,6 @@ class ProductController extends Controller
     public function update(Request $request, Product $product)
     {
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
             'description' => 'nullable|string',
@@ -94,6 +82,10 @@ class ProductController extends Controller
 
     public function destroy(Product $product)
     {
+        if (!auth()->user()->hasRole('superadmin') && !auth()->user()->hasPermissionTo('delete-products')) {
+            abort(403, 'Unauthorized action.');
+        }
+
         if ($product->image) {
             Storage::disk('public')->delete($product->image);
         }

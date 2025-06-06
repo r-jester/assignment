@@ -3,8 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
-use App\Models\Tenant;
-use App\Models\Business;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Spatie\Permission\Exceptions\UnauthorizedException;
@@ -13,11 +11,6 @@ class CustomerController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->hasPermissionTo('view-customers')) {
-            throw UnauthorizedException::forPermissions(['view-customers']);
-        }
-
-        // $customers = Customer::with(['tenant', 'business'])->paginate(10);
         $customers = Customer::paginate(10);
         return view('customers.index', compact('customers'));
     }
@@ -28,8 +21,6 @@ class CustomerController extends Controller
             throw UnauthorizedException::forPermissions(['create-customers']);
         }
 
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
         return view('customers.create');
     }
 
@@ -40,8 +31,6 @@ class CustomerController extends Controller
         }
 
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:customers,email',
@@ -77,8 +66,6 @@ class CustomerController extends Controller
             throw UnauthorizedException::forPermissions(['edit-customers']);
         }
 
-        // $tenants = Tenant::all();
-        // $businesses = Business::all();
         return view('customers.edit', compact('customer'));
     }
 
@@ -89,8 +76,6 @@ class CustomerController extends Controller
         }
 
         $validated = $request->validate([
-            // 'tenant_id' => 'required|exists:tenants,id',
-            // 'business_id' => 'required|exists:businesses,id',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'nullable|email|unique:customers,email,' . $customer->id,

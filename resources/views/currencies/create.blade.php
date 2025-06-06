@@ -6,19 +6,6 @@
 
     <form action="{{ route('currencies.store') }}" method="POST">
         @csrf
-
-        <div class="mb-4">
-            <label class="block text-sm font-medium">Tenant</label>
-            <select name="tenant_id" class="mt-1 block w-full border rounded p-2">
-                @foreach ($tenants as $tenant)
-                    <option value="{{ $tenant->id }}">{{ $tenant->name }}</option>
-                @endforeach
-            </select>
-            @error('tenant_id')
-                <span class="text-red-500 text-sm">{{ $message }}</span>
-            @enderror
-        </div>
-
         <div class="mb-4">
             <label class="block text-sm font-medium">Code</label>
             <input type="text" name="code" class="mt-1 block w-full border rounded p-2" value="{{ old('code') }}">

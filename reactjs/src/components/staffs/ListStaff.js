@@ -2,50 +2,164 @@ import React, { useEffect, useState } from 'react';
 import api from '../../services/api';
 
 function ListStaff() {
-  const [staffList, setStaffList] = useState([]);
+  const [staffList, setStaffList] = useState({ data: [] });
+  const [currentPage, setCurrentPage] = useState(1);
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [departments, setDepartments] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [currentUser, setCurrentUser] = useState(null);
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (page = 1) => {
     try {
-      const { data } = await api.get('/users');
+      const { data } = await api.get(`/users?page=${page}`);
+      if (currentUser?.role !== 'superadmin') {
+        data.data = data.data.filter(user => user.role !== 'superadmin' && user.id !== 1);
+      } else {
+        data.data = data.data.filter(user => user.id !== 1);
+      }
       setStaffList(data);
     } catch (err) {
       console.error('Fetch error:', err);
     }
   };
 
-  useEffect(() => { fetchUsers(); }, []);
+  const fetchCurrentUser = async () => {
+    try {
+      const { data } = await api.get('/current-user');
+      setCurrentUser(data);
+    } catch (err) {
+      console.error('Fetch current user error:', err);
+    }
+  };
 
-  const handleDelete = async (id) => {
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const [deptResponse, posResponse] = await Promise.all([
+          api.get('/departments'),
+          api.get('/positions'),
+        ]);
+        setDepartments(deptResponse.data);
+        setPositions(posResponse.data);
+      } catch (error) {
+        console.error('Error fetching dropdowns:', error);
+      }
+    };
+    fetchData();
+    fetchCurrentUser();
+    fetchUsers(currentPage);
+  }, [currentPage]);
+
+  const handleDelete = async (id, role) => {
+    if (role === 'superadmin') {
+      alert('Cannot delete a superadmin user');
+      return;
+    }
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await api.delete(`/users/delete/${id}`);
-      fetchUsers();
+      fetchUsers(currentPage);
+      alert('User deleted successfully');
     } catch (err) {
       console.error('Delete error:', err);
+      alert('Failed to delete user');
     }
   };
 
   const handleEditClick = (user) => {
-    setEditingUser({ ...user, password: '' });
+    setEditingUser({
+      id: user.id || '',
+      department_id: user.department_id || '',
+      position_id: user.position_id || '',
+      phone: user.phone || '',
+      username: user.username || '',
+      password: '',
+      first_name: user.first_name || '',
+      last_name: user.last_name || '',
+      email: user.email || '',
+      hire_date: user.hire_date || '',
+      salary: user.salary || '',
+      status: user.status || 'active',
+      image: null,
+    });
     setShowModal(true);
   };
 
-  const handleUpdate = async () => {
+  const handleInputChange = (field, value) => {
+    setEditingUser(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const validateForm = () => {
+    const errors = [];
+    if (!editingUser.department_id) errors.push('Department is required');
+    if (!editingUser.position_id) errors.push('Position is required');
+    if (!editingUser.username) errors.push('Username is required');
+    if (!editingUser.first_name) errors.push('First Name is required');
+    if (!editingUser.last_name) errors.push('Last Name is required');
+    if (!editingUser.email) errors.push('Email is required');
+    if (!editingUser.hire_date) errors.push('Hire Date is required');
+    if (!editingUser.salary) errors.push('Salary is required');
+    if (!editingUser.status) errors.push('Status is required');
+    return errors;
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    if (!editingUser) return;
+
+    const errors = validateForm();
+    if (errors.length > 0) {
+      alert(`Please fix the following errors:\n${errors.join('\n')}`);
+      return;
+    }
+
     try {
-      await api.patch(
-        `/users/update/${editingUser.id}`,
-        {
-          txtname: editingUser.name,
-          txtemail: editingUser.email,
-          ...(editingUser.password ? { txtpass: editingUser.password } : {})
-        }
-      );
+      const formData = new FormData();
+      formData.append('department_id', editingUser.department_id);
+      formData.append('position_id', editingUser.position_id);
+      formData.append('phone', editingUser.phone || '');
+      formData.append('username', editingUser.username);
+      if (editingUser.password) formData.append('password', editingUser.password);
+      formData.append('first_name', editingUser.first_name);
+      formData.append('last_name', editingUser.last_name);
+      formData.append('email', editingUser.email);
+      formData.append('hire_date', editingUser.hire_date);
+      formData.append('salary', editingUser.salary);
+      formData.append('status', editingUser.status);
+      if (editingUser.image) formData.append('image', editingUser.image);
+
+      await api.patch(`/users/update/${editingUser.id}`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' },
+      });
       setShowModal(false);
-      fetchUsers();
+      setEditingUser(null);
+      fetchUsers(currentPage);
+      alert('User updated successfully at 06:21 PM +07 on Friday, June 06, 2025');
     } catch (err) {
       console.error('Update error:', err);
+      const errorMessage = err.response?.data?.message || 'Failed to update user';
+      alert(errorMessage);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowModal(false);
+    setEditingUser(null);
+  };
+
+  const handlePrev = () => {
+    if (staffList.current_page > 1) {
+      setCurrentPage((prev) => prev - 1);
+    }
+  };
+
+  const handleNext = () => {
+    if (staffList.current_page < staffList.last_page) {
+      setCurrentPage((prev) => prev + 1);
     }
   };
 
@@ -55,65 +169,193 @@ function ListStaff() {
       <table style={styles.table}>
         <thead>
           <tr>
-            <th style={styles.th}>ID</th>
+            <th style={styles.th}>No.</th>
+            <th style={styles.th}>Username</th>
             <th style={styles.th}>Name</th>
             <th style={styles.th}>Email</th>
             <th style={styles.th}>Actions</th>
           </tr>
         </thead>
         <tbody>
-          {staffList.map((u) => (
-            <tr key={u.id} style={styles.tr}>
-              <td style={styles.td}>{u.id}</td>
-              <td style={styles.td}>{u.name}</td>
-              <td style={styles.td}>{u.email}</td>
-              <td style={styles.td}>
-                <button style={styles.editBtn} onClick={() => handleEditClick(u)}>Edit</button>
-                <button style={styles.deleteBtn} onClick={() => handleDelete(u.id)}>Delete</button>
-              </td>
-            </tr>
-          ))}
+          {Array.isArray(staffList.data) &&
+            staffList.data.map((u) => (
+              <tr key={u.id} style={styles.tr}>
+                <td style={styles.td}>{u.id}</td>
+                <td style={styles.td}>{u.username}</td>
+                <td style={styles.td}>{`${u.first_name} ${u.last_name}`}</td>
+                <td style={styles.td}>{u.email}</td>
+                <td style={styles.td}>
+                  <button style={styles.editBtn} onClick={() => handleEditClick(u)}>
+                    Edit
+                  </button>
+                  <button style={styles.deleteBtn} onClick={() => handleDelete(u.id, u.role)}>
+                    Delete
+                  </button>
+                </td>
+              </tr>
+            ))}
         </tbody>
       </table>
+
+      <div style={{ marginTop: '20px', textAlign: 'center' }}>
+        <button onClick={handlePrev} disabled={staffList.current_page === 1} style={styles.navBtn}>
+          Previous
+        </button>
+        <span style={{ margin: '0 10px' }}>
+          Page {staffList.current_page} of {staffList.last_page}
+        </span>
+        <button onClick={handleNext} disabled={staffList.current_page === staffList.last_page} style={styles.navBtn}>
+          Next
+        </button>
+      </div>
 
       {showModal && editingUser && (
         <div style={styles.modalOverlay}>
           <div style={styles.modalContent}>
             <h3 style={styles.modalHeading}>Edit User</h3>
-            <label style={styles.modalLabel}>Name:
-              <input
-                type="text"
-                value={editingUser.name}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, name: e.target.value })
-                }
-                style={styles.modalInput}
-              />
-            </label>
-            <label style={styles.modalLabel}>Email:
-              <input
-                type="email"
-                value={editingUser.email}
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, email: e.target.value })
-                }
-                style={styles.modalInput}
-              />
-            </label>
-            <label style={styles.modalLabel}>Password:
-              <input
-                type="password"
-                placeholder="Leave blank if unchanged"
-                onChange={(e) =>
-                  setEditingUser({ ...editingUser, password: e.target.value })
-                }
-                style={styles.modalInput}
-              />
-            </label>
-            <div style={styles.modalFooter}>
-              <button style={styles.saveBtn} onClick={handleUpdate}>Save</button>
-              <button style={styles.cancelBtn} onClick={() => setShowModal(false)}>Cancel</button>
-            </div>
+            <form onSubmit={handleUpdate} style={styles.form}>
+              <label style={styles.modalLabel}>
+                Department:
+                <select
+                  value={editingUser.department_id || ''}
+                  onChange={(e) => handleInputChange('department_id', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                >
+                  <option value="">Select Department</option>
+                  {departments.map((dept) => (
+                    <option key={dept.id} value={dept.id}>
+                      {dept.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label style={styles.modalLabel}>
+                Position:
+                <select
+                  value={editingUser.position_id || ''}
+                  onChange={(e) => handleInputChange('position_id', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                >
+                  <option value="">Select Position</option>
+                  {positions.map((pos) => (
+                    <option key={pos.id} value={pos.id}>
+                      {pos.name}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label style={styles.modalLabel}>
+                Phone:
+                <input
+                  type="text"
+                  value={editingUser.phone || ''}
+                  onChange={(e) => handleInputChange('phone', e.target.value)}
+                  style={styles.modalInput}
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Username:
+                <input
+                  type="text"
+                  value={editingUser.username || ''}
+                  onChange={(e) => handleInputChange('username', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Password:
+                <input
+                  type="password"
+                  value={editingUser.password || ''}
+                  onChange={(e) => handleInputChange('password', e.target.value)}
+                  placeholder="Leave blank if unchanged"
+                  style={styles.modalInput}
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                First Name:
+                <input
+                  type="text"
+                  value={editingUser.first_name || ''}
+                  onChange={(e) => handleInputChange('first_name', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Last Name:
+                <input
+                  type="text"
+                  value={editingUser.last_name || ''}
+                  onChange={(e) => handleInputChange('last_name', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Email:
+                <input
+                  type="email"
+                  value={editingUser.email || ''}
+                  onChange={(e) => handleInputChange('email', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Hire Date:
+                <input
+                  type="date"
+                  value={editingUser.hire_date || ''}
+                  onChange={(e) => handleInputChange('hire_date', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Salary:
+                <input
+                  type="number"
+                  value={editingUser.salary || ''}
+                  onChange={(e) => handleInputChange('salary', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                />
+              </label>
+              <label style={styles.modalLabel}>
+                Status:
+                <select
+                  value={editingUser.status || 'active'}
+                  onChange={(e) => handleInputChange('status', e.target.value)}
+                  style={styles.modalInput}
+                  required
+                >
+                  <option value="active">Active</option>
+                  <option value="inactive">Inactive</option>
+                  <option value="terminated">Terminated</option>
+                </select>
+              </label>
+              <label style={styles.modalLabel}>
+                Image:
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => handleInputChange('image', e.target.files[0])}
+                  style={styles.modalInput}
+                />
+              </label>
+              <div style={styles.modalFooter}>
+                <button type="submit" style={styles.saveBtn}>
+                  Save
+                </button>
+                <button type="button" style={styles.cancelBtn} onClick={handleCloseModal}>
+                  Cancel
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
@@ -171,9 +413,18 @@ const styles = {
     borderRadius: '4px',
     cursor: 'pointer',
   },
+  navBtn: {
+    padding: '8px 16px',
+    backgroundColor: '#007bff',
+    color: '#fff',
+    border: 'none',
+    borderRadius: '4px',
+    cursor: 'pointer',
+  },
   modalOverlay: {
     position: 'fixed',
-    top: 0, left: 0,
+    top: 0,
+    left: 0,
     width: '100vw',
     height: '100vh',
     backgroundColor: 'rgba(0,0,0,0.5)',
@@ -183,7 +434,8 @@ const styles = {
     zIndex: 1000,
   },
   modalContent: {
-    width: '360px',
+    width: '400px',
+    maxHeight: '90vh',
     backgroundColor: '#fff',
     padding: '20px',
     borderRadius: '8px',
@@ -191,11 +443,18 @@ const styles = {
     display: 'flex',
     flexDirection: 'column',
     gap: '12px',
+    overflowY: 'auto',
   },
   modalHeading: {
-    margin: 0,
+    margin: '0 0 10px 0',
     textAlign: 'center',
     color: '#333',
+    fontSize: '20px',
+  },
+  form: {
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '10px',
   },
   modalLabel: {
     display: 'flex',
@@ -205,10 +464,12 @@ const styles = {
   },
   modalInput: {
     marginTop: '4px',
-    padding: '8px',
+    padding: '10px',
     border: '1px solid #ccc',
     borderRadius: '4px',
     fontSize: '14px',
+    width: '100%',
+    boxSizing: 'border-box',
   },
   modalFooter: {
     display: 'flex',
@@ -217,20 +478,22 @@ const styles = {
     marginTop: '10px',
   },
   saveBtn: {
-    padding: '8px 16px',
+    padding: '10px 20px',
     backgroundColor: '#28a745',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
+    fontSize: '14px',
   },
   cancelBtn: {
-    padding: '8px 16px',
+    padding: '10px 20px',
     backgroundColor: '#6c757d',
     color: '#fff',
     border: 'none',
     borderRadius: '4px',
     cursor: 'pointer',
+    fontSize: '14px',
   },
 };
 

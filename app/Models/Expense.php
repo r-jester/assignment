@@ -18,21 +18,6 @@ class Expense extends Model
         'expense_date' => 'date',
     ];
 
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class);
-    // }
-
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
-
-    // public function location()
-    // {
-    //     return $this->belongsTo(BusinessLocation::class);
-    // }
-
     public function user()
     {
         return $this->belongsTo(Employee::class, 'user_id');

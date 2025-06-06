@@ -1,32 +1,28 @@
-import React from 'react';
+import React from "react";
 
-function Footer() {
-    const currentYear = new Date().getFullYear(); // Get the current year
-
-    const styles = {
-        footer: {
-            backgroundColor: '#282c34',
-            color: 'white',
-            textAlign: 'center',
-            padding: '10px 20px',
-            position: 'fixed', // Fixed position to keep it at the bottom
-            left: '0',
-            bottom: '0',
-            width: '100%',
-        },
-        text: {
-            margin: '0',
-            fontSize: '0.9em',
-        },
-    };
-
-    return (
-        <footer style={styles.footer}>
-            <p style={styles.text}>
-                © {currentYear} All rights reserved. Built by <strong>Jester</strong>.
-            </p>
-        </footer>
-    );
-}
+const Footer = ({ username }) => {
+  return (
+    <footer
+      style={{
+        height: 60,
+        backgroundColor: "#374151",
+        color: "white",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        fontSize: 14,
+        userSelect: "none",
+        flexShrink: 0,
+        borderTop: "1px solid #4b5563",
+        boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+      © 2025 Your Company — Logged in as{" "}
+      <strong style={{ marginLeft: 5, color: "#60a5fa" }}>
+        {username || "..."}
+      </strong>
+    </footer>
+  );
+};
 
 export default Footer;

@@ -4,8 +4,6 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Unit Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            <p><strong>Tenant:</strong> {{ $unit->tenant->name }}</p>
-            <p><strong>Business:</strong> {{ $unit->business->name }}</p>
             <p><strong>Name:</strong> {{ $unit->name }}</p>
             <p><strong>Short Name:</strong> {{ $unit->short_name }}</p>
             <div class="mt-4">

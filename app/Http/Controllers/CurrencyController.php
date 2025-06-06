@@ -3,27 +3,24 @@
 namespace App\Http\Controllers;
 
 use App\Models\Currency;
-use App\Models\Tenant;
 use Illuminate\Http\Request;
 
 class CurrencyController extends Controller
 {
     public function index()
     {
-        $currencies = Currency::with('tenant')->paginate(10);
+        $currencies = Currency::paginate(10);
         return view('currencies.index', compact('currencies'));
     }
 
     public function create()
     {
-        $tenants = Tenant::all();
-        return view('currencies.create', compact('tenants'));
+        return view('currencies.create');
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
             'code' => 'required|string|size:3|unique:currencies',
             'name' => 'required|string|max:255',
             'symbol' => 'required|string|max:10',
@@ -36,20 +33,17 @@ class CurrencyController extends Controller
 
     public function show(Currency $currency)
     {
-        $currency->load('tenant');
         return view('currencies.show', compact('currency'));
     }
 
     public function edit(Currency $currency)
     {
-        $tenants = Tenant::all();
-        return view('currencies.edit', compact('currency', 'tenants'));
+        return view('currencies.edit', compact('currency'));
     }
 
     public function update(Request $request, Currency $currency)
     {
         $validated = $request->validate([
-            'tenant_id' => 'required|exists:tenants,id',
             'code' => 'required|string|size:3|unique:currencies,code,' . $currency->id,
             'name' => 'required|string|max:255',
             'symbol' => 'required|string|max:10',

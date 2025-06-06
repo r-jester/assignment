@@ -10,7 +10,7 @@ class Attendance extends Model
     use HasFactory;
 
     protected $fillable = [
-        'employee_id', 'business_id', 'check_in', 'check_out', 'date'
+        'employee_id', 'check_in', 'check_out', 'date'
     ];
 
     protected $casts = [
@@ -18,11 +18,6 @@ class Attendance extends Model
         'check_out' => 'datetime',
         'date' => 'date',
     ];
-
-    public function business()
-    {
-        return $this->belongsTo(Business::class);
-    }
 
     public function employee()
     {

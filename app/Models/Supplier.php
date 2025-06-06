@@ -12,17 +12,7 @@ class Supplier extends Model
     protected $fillable = [
         'name', 'email', 'phone', 'address'
     ];
-
-    // public function tenant()
-    // {
-    //     return $this->belongsTo(Tenant::class)->withDefault(['name' => 'None']);
-    // }
-
-    // public function business()
-    // {
-    //     return $this->belongsTo(Business::class);
-    // }
-
+    
     public function purchases()
     {
         return $this->hasMany(Purchase::class);

@@ -4,7 +4,6 @@
     <div class="container mx-auto p-6">
         <h1 class="text-2xl font-bold mb-4">Currency Details</h1>
         <div class="bg-white p-6 rounded shadow">
-            <p><strong>Tenant:</strong> {{ $currency->tenant->name }}</p>
             <p><strong>Code:</strong> {{ $currency->code }}</p>
             <p><strong>Name:</strong> {{ $currency->name }}</p>
             <p><strong>Symbol:</strong> {{ $currency->symbol }}</p>

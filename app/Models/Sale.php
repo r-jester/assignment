@@ -10,9 +10,6 @@ class Sale extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 
-        'business_id', 
-        'location_id', 
         'customer_id', 
         'user_id',
         'invoice_number', // Add this
@@ -24,22 +21,7 @@ class Sale extends Model
     protected $casts = [
         'status' => 'string',
     ];
-
-    public function tenant()
-    {
-        return $this->belongsTo(Tenant::class);
-    }
-
-    public function business()
-    {
-        return $this->belongsTo(Business::class);
-    }
-
-    public function location()
-    {
-        return $this->belongsTo(BusinessLocation::class);
-    }
-
+    
     public function customer()
     {
         return $this->belongsTo(Customer::class);

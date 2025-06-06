@@ -7,14 +7,6 @@ use Illuminate\Http\Request;
 
 class PromotionController extends Controller
 {
-    public function __construct()
-    {
-        $this->middleware(['permission:view-promotions'])->only(['index', 'show']);
-        $this->middleware(['permission:create-promotions'])->only(['create', 'store']);
-        $this->middleware(['permission:edit-promotions'])->only(['edit', 'update']);
-        $this->middleware(['permission:delete-promotions'])->only(['destroy']);
-    }
-
     public function index()
     {
         $promotions = Promotion::all();

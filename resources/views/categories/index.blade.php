@@ -8,8 +8,6 @@
             <thead>
                 <tr>
                     <th class="py-2 px-4 border-b">Name</th>
-                    <th class="py-2 px-4 border-b">Tenant</th>
-                    {{-- <th class="py-2 px-4 border-b">Business</th> --}}
                     <th class="py-2 px-4 border-b">Actions</th>
                 </tr>
             </thead>
@@ -17,8 +15,6 @@
                 @foreach ($categories as $category)
                     <tr>
                         <td class="py-2 px-4 border-b">{{ $category->name }}</td>
-                        {{-- <td class="py-2 px-4 border-b">{{ $category->tenant->name }}</td>
-                        <td class="py-2 px-4 border-b">{{ $category->business->name }}</td> --}}
                         <td class="py-2 px-4 border-b">
                             <a href="{{ route('categories.show', $category) }}" class="text-blue-500">View</a>
                             <a href="{{ route('categories.edit', $category) }}" class="text-green-500 ml-2">Edit</a>

@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -17,10 +16,10 @@
         }
     </style>
 </head>
-
 <body>
     <section class="wrapbody">
         <h3 align="center">Member's Login</h3>
+        <p><a href="{{ route('login', ['ui' => 'auth']) }}" class="btn btn-secondary">Switch to User Login</a></p>
         <p style="color:red">{{ session()->get('status') }}</p>
         <form action="/login" method="POST">
             @csrf
@@ -28,13 +27,10 @@
             <input type="text" name="username" placeholder="please input your username" class="form-control">
             <label for="pass">Password</label>
             <input type="password" name="password" placeholder="************" class="form-control">
-
             <div align="center" style="margin-top:20px;">
                 <button type="submit" class="btn btn-danger">login</button>
             </div>
-
         </form>
     </section>
 </body>
-
 </html>

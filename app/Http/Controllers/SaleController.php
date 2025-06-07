@@ -49,7 +49,7 @@ class SaleController extends Controller
             'customer_id' => 'nullable|exists:customers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
-            'items' => 'required|array',
+            'items' => 'required|array|min:1',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
             'items.*.tax_rate_id' => 'nullable|exists:tax_rates,id',
@@ -57,7 +57,7 @@ class SaleController extends Controller
 
         // Validate stock availability
         foreach ($validated['items'] as $index => $item) {
-            $product = Product::find($item['product_id']);
+            $product = Product::findOrFail($item['product_id']);
             if ($product->stock_quantity < $item['quantity']) {
                 return redirect()->back()->withErrors([
                     "items.$index.quantity" => "Insufficient stock for product {$product->name}. Available: {$product->stock_quantity}, Requested: {$item['quantity']}",
@@ -71,7 +71,7 @@ class SaleController extends Controller
             $taxAmount = 0;
 
             foreach ($validated['items'] as $item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::findOrFail($item['product_id']);
                 $quantity = $item['quantity'];
                 $subtotal = $product->price * $quantity;
                 $taxRate = isset($item['tax_rate_id']) ? TaxRate::find($item['tax_rate_id']) : null;
@@ -80,21 +80,21 @@ class SaleController extends Controller
                 $taxAmount += $itemTaxAmount;
             }
 
-            // Generate invoice number
+            // Generate unique invoice number
             $latestSale = Sale::latest()->first();
-            $invoiceNumber = 'INV-' . str_pad(($latestSale ? $latestSale->id + 1 : 1), 4, '0', STR_PAD_LEFT);
+            $invoiceNumber = 'INV-' . str_pad(($latestSale ? $latestSale->id + 1 : 1), 8, '0', STR_PAD_LEFT);
 
             $sale = Sale::create([
-                'customer_id' => $validated['customer_id'],
+                'customer_id' => $validated['customer_id'] ?: null,
                 'user_id' => $validated['user_id'],
                 'invoice_number' => $invoiceNumber,
-                'status' => $validated['status'],
                 'total_amount' => $totalAmount,
                 'tax_amount' => $taxAmount,
+                'status' => $validated['status'],
             ]);
 
             foreach ($validated['items'] as $item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::findOrFail($item['product_id']);
                 $quantity = $item['quantity'];
                 $unit_price = $product->price;
                 $subtotal = $unit_price * $quantity;
@@ -116,13 +116,8 @@ class SaleController extends Controller
 
                 // Update or create InventorySummary
                 InventorySummary::updateOrCreate(
-                    [
-                        'product_id' => $item['product_id'],
-                    ],
-                    [
-                        'stock_quantity' => $product->stock_quantity,
-                        'last_updated' => now(),
-                    ]
+                    ['product_id' => $item['product_id']],
+                    ['stock_quantity' => $product->stock_quantity, 'last_updated' => now()]
                 );
             }
 
@@ -169,7 +164,7 @@ class SaleController extends Controller
             'customer_id' => 'nullable|exists:customers,id',
             'user_id' => 'required|exists:employees,id',
             'status' => 'required|in:completed,pending,cancelled',
-            'items' => 'required|array',
+            'items' => 'required|array|min:1',
             'items.*.id' => 'nullable|exists:sale_items,id',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.quantity' => 'required|integer|min:1',
@@ -180,24 +175,18 @@ class SaleController extends Controller
         try {
             // Restore original quantities
             foreach ($sale->saleItems as $saleItem) {
-                $product = Product::find($saleItem->product_id);
+                $product = Product::findOrFail($saleItem->product_id);
                 $product->increment('stock_quantity', $saleItem->quantity);
 
-                // Update InventorySummary
-                $inventorySummary = InventorySummary::where([
-                    'product_id' => $saleItem->product_id,
-                ])->first();
-                if ($inventorySummary) {
-                    $inventorySummary->update([
-                        'stock_quantity' => $product->stock_quantity,
-                        'last_updated' => now(),
-                    ]);
-                }
+                InventorySummary::updateOrCreate(
+                    ['product_id' => $saleItem->product_id],
+                    ['stock_quantity' => $product->stock_quantity, 'last_updated' => now()]
+                );
             }
 
             // Validate new stock availability
             foreach ($validated['items'] as $index => $item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::findOrFail($item['product_id']);
                 if ($product->stock_quantity < $item['quantity']) {
                     DB::rollBack();
                     return redirect()->back()->withErrors([
@@ -209,7 +198,7 @@ class SaleController extends Controller
             $totalAmount = 0;
             $taxAmount = 0;
             foreach ($validated['items'] as $item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::findOrFail($item['product_id']);
                 $quantity = $item['quantity'];
                 $subtotal = $product->price * $quantity;
                 $taxRate = isset($item['tax_rate_id']) ? TaxRate::find($item['tax_rate_id']) : null;
@@ -219,11 +208,11 @@ class SaleController extends Controller
             }
 
             $sale->update([
-                'customer_id' => $validated['customer_id'],
+                'customer_id' => $validated['customer_id'] ?: null,
                 'user_id' => $validated['user_id'],
-                'status' => $validated['status'],
                 'total_amount' => $totalAmount,
                 'tax_amount' => $taxAmount,
+                'status' => $validated['status'],
             ]);
 
             $existingItemIds = $sale->saleItems->pluck('id')->toArray();
@@ -235,7 +224,7 @@ class SaleController extends Controller
             }
 
             foreach ($validated['items'] as $item) {
-                $product = Product::find($item['product_id']);
+                $product = Product::findOrFail($item['product_id']);
                 $quantity = $item['quantity'];
                 $unit_price = $product->price;
                 $subtotal = $unit_price * $quantity;
@@ -258,18 +247,11 @@ class SaleController extends Controller
                     SaleItem::create($saleItemData);
                 }
 
-                // Deduct stock quantity
                 $product->decrement('stock_quantity', $quantity);
 
-                // Update or create InventorySummary
                 InventorySummary::updateOrCreate(
-                    [
-                        'product_id' => $item['product_id'],
-                    ],
-                    [
-                        'stock_quantity' => $product->stock_quantity,
-                        'last_updated' => now(),
-                    ]
+                    ['product_id' => $item['product_id']],
+                    ['stock_quantity' => $product->stock_quantity, 'last_updated' => now()]
                 );
             }
 
@@ -291,19 +273,13 @@ class SaleController extends Controller
         try {
             // Restore stock quantities
             foreach ($sale->saleItems as $saleItem) {
-                $product = Product::find($saleItem->product_id);
+                $product = Product::findOrFail($saleItem->product_id);
                 $product->increment('stock_quantity', $saleItem->quantity);
 
-                // Update InventorySummary
-                $inventorySummary = InventorySummary::where([
-                    'product_id' => $saleItem->product_id,
-                ])->first();
-                if ($inventorySummary) {
-                    $inventorySummary->update([
-                        'stock_quantity' => $product->stock_quantity,
-                        'last_updated' => now(),
-                    ]);
-                }
+                InventorySummary::updateOrCreate(
+                    ['product_id' => $saleItem->product_id],
+                    ['stock_quantity' => $product->stock_quantity, 'last_updated' => now()]
+                );
             }
 
             $sale->saleItems()->delete();

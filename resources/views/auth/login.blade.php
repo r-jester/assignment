@@ -9,6 +9,7 @@
 <body>
     <div class="container mt-5">
         <h1>Login</h1>
+        <p><a href="{{ route('login', ['ui' => 'admin']) }}" class="btn btn-secondary">Switch to Admin and Superadmin Login</a></p>
         @if ($errors->any())
             <div class="alert alert-danger">
                 {{ $errors->first() }}

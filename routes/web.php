@@ -29,6 +29,10 @@ use App\Http\Controllers\DiscountController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', function () {
+    $ui = request()->query('ui', 'auth'); // Default to 'auth' if no query param
+    if ($ui === 'admin') {
+        return view('admin.login');
+    }
     return view('auth.login');
 })->name('login');
 

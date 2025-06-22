@@ -1,37 +1,40 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import api from '../../services/api';
 
 function ListStaff() {
-  const [staffList, setStaffList] = useState({ data: [] });
+  const [staffList, setStaffList] = useState({ data: [], current_page: 1, last_page: 1 });
   const [currentPage, setCurrentPage] = useState(1);
   const [editingUser, setEditingUser] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [departments, setDepartments] = useState([]);
   const [positions, setPositions] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null);
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [fetchedPages, setFetchedPages] = useState(new Set());
 
-  const fetchUsers = useCallback(async (page = 1) => {
+  // Memoize storedUser to prevent useCallback recreation
+  const storedUser = useMemo(() => JSON.parse(localStorage.getItem('user')) || null, []);
+
+  const fetchUsers = useCallback(async (page) => {
+    // Prevent fetching if page was already fetched
+    if (fetchedPages.has(page)) return;
+
+    setLoading(true);
+    setError(null);
     try {
+      console.log('Fetching users, page:', page);
       const { data } = await api.get(`/users?page=${page}`);
-      if (currentUser?.role !== 'superadmin') {
-        data.data = data.data.filter(user => user.role !== 'superadmin' && user.id !== 1);
-      } else {
-        data.data = data.data.filter(user => user.id !== 1);
-      }
-      setStaffList(data);
-    } catch (err) {
-      console.error('Fetch error:', err);
-    }
-  }, [currentUser]);
+      console.log('Users API response:', data);
 
-  const fetchCurrentUser = async () => {
-    try {
-      const { data } = await api.get('/current-user');
-      setCurrentUser(data);
+      setStaffList(data);
+      setFetchedPages(prev => new Set(prev).add(page));
     } catch (err) {
-      console.error('Fetch current user error:', err);
+      console.error('Fetch error:', err.response ? err.response.data : err.message);
+      setError(err.response?.data?.message || 'Failed to load users.');
+    } finally {
+      setLoading(false);
     }
-  };
+  }, [fetchedPages]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,21 +43,21 @@ function ListStaff() {
           api.get('/departments'),
           api.get('/positions'),
         ]);
+        console.log('Departments:', deptResponse.data);
+        console.log('Positions:', posResponse.data);
         setDepartments(deptResponse.data);
         setPositions(posResponse.data);
       } catch (error) {
-        console.error('Error fetching dropdowns:', error);
+        console.error('Error fetching dropdowns:', error.response ? error.response.data : error.message);
+        setError('Failed to load departments or positions.');
       }
     };
     fetchData();
-    fetchCurrentUser();
   }, []);
 
   useEffect(() => {
-    if (currentUser) {
-      fetchUsers(currentPage);
-    }
-  }, [currentPage, currentUser, fetchUsers]);
+    fetchUsers(currentPage);
+  }, [currentPage, fetchUsers]);
 
   const handleDelete = async (id, role) => {
     if (role === 'superadmin') {
@@ -64,11 +67,12 @@ function ListStaff() {
     if (!window.confirm('Are you sure you want to delete this user?')) return;
     try {
       await api.delete(`/users/delete/${id}`);
+      setFetchedPages(new Set()); // Reset cache
       fetchUsers(currentPage);
       alert('User deleted successfully');
     } catch (err) {
-      console.error('Delete error:', err);
-      alert('Failed to delete user');
+      console.error('Delete error:', err.response ? err.response.data : err.message);
+      alert(err.response?.data?.message || 'Failed to delete user');
     }
   };
 
@@ -83,7 +87,7 @@ function ListStaff() {
       first_name: user.first_name || '',
       last_name: user.last_name || '',
       email: user.email || '',
-      hire_date: user.hire_date ? user.hire_date.split('T')[0] : '', // Format date for input
+      hire_date: user.hire_date ? user.hire_date.split('T')[0] : '',
       salary: user.salary || '',
       status: user.status || 'active',
       image: null,
@@ -110,13 +114,11 @@ function ListStaff() {
     if (!editingUser.salary) errors.push('Salary is required');
     if (!editingUser.status) errors.push('Status is required');
     
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (editingUser.email && !emailRegex.test(editingUser.email)) {
       errors.push('Please enter a valid email address');
     }
     
-    // Salary validation
     if (editingUser.salary && (isNaN(editingUser.salary) || Number(editingUser.salary) < 0)) {
       errors.push('Salary must be a positive number');
     }
@@ -154,10 +156,11 @@ function ListStaff() {
       });
       setShowModal(false);
       setEditingUser(null);
+      setFetchedPages(new Set()); // Reset cache
       fetchUsers(currentPage);
       alert('User updated successfully');
     } catch (err) {
-      console.error('Update error:', err);
+      console.error('Update error:', err.response ? err.response.data : err.message);
       const errorMessage = err.response?.data?.message || 'Failed to update user';
       alert(errorMessage);
     }
@@ -170,82 +173,91 @@ function ListStaff() {
 
   const handlePrev = () => {
     if (staffList.current_page > 1) {
-      setCurrentPage((prev) => prev - 1);
+      setCurrentPage(prev => prev - 1);
     }
   };
 
   const handleNext = () => {
     if (staffList.current_page < staffList.last_page) {
-      setCurrentPage((prev) => prev + 1);
+      setCurrentPage(prev => prev + 1);
     }
   };
 
   return (
     <div style={styles.container}>
       <h2 style={styles.heading}>User List</h2>
-      <table style={styles.table}>
-        <thead>
-          <tr>
-            <th style={styles.th}>No.</th>
-            <th style={styles.th}>Username</th>
-            <th style={styles.th}>Name</th>
-            <th style={styles.th}>Email</th>
-            <th style={styles.th}>Department</th>
-            <th style={styles.th}>Position</th>
-            <th style={styles.th}>Status</th>
-            <th style={styles.th}>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {Array.isArray(staffList.data) &&
-            staffList.data.map((u) => (
-              <tr key={u.id} style={styles.tr}>
-                <td style={styles.td}>{u.id}</td>
-                <td style={styles.td}>{u.username}</td>
-                <td style={styles.td}>{`${u.first_name} ${u.last_name}`}</td>
-                <td style={styles.td}>{u.email}</td>
-                <td style={styles.td}>{u.department?.name || 'N/A'}</td>
-                <td style={styles.td}>{u.position?.name || 'N/A'}</td>
-                <td style={styles.td}>
-                  <span style={{
-                    ...styles.statusBadge,
-                    backgroundColor: u.status === 'active' ? '#28a745' : u.status === 'inactive' ? '#ffc107' : '#dc3545'
-                  }}>
-                    {u.status}
-                  </span>
-                </td>
-                <td style={styles.td}>
-                  <button style={styles.editBtn} onClick={() => handleEditClick(u)}>
-                    Edit
-                  </button>
-                  <button style={styles.deleteBtn} onClick={() => handleDelete(u.id, u.role)}>
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-        </tbody>
-      </table>
-
-      <div style={{ marginTop: '20px', textAlign: 'center' }}>
-        <button onClick={handlePrev} disabled={staffList.current_page === 1} style={{
-          ...styles.navBtn,
-          opacity: staffList.current_page === 1 ? 0.5 : 1,
-          cursor: staffList.current_page === 1 ? 'not-allowed' : 'pointer'
-        }}>
-          Previous
-        </button>
-        <span style={{ margin: '0 10px' }}>
-          Page {staffList.current_page || 1} of {staffList.last_page || 1}
-        </span>
-        <button onClick={handleNext} disabled={staffList.current_page === staffList.last_page} style={{
-          ...styles.navBtn,
-          opacity: staffList.current_page === staffList.last_page ? 0.5 : 1,
-          cursor: staffList.current_page === staffList.last_page ? 'not-allowed' : 'pointer'
-        }}>
-          Next
-        </button>
-      </div>
+      {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
+      {loading ? (
+        <p style={{ textAlign: 'center' }}>Loading...</p>
+      ) : (
+        <>
+          {staffList.data.length === 0 ? (
+            <p style={{ textAlign: 'center' }}>No users found.</p>
+          ) : (
+            <table style={styles.table}>
+              <thead>
+                <tr>
+                  <th style={styles.th}>No.</th>
+                  <th style={styles.th}>Username</th>
+                  <th style={styles.th}>Name</th>
+                  <th style={styles.th}>Email</th>
+                  <th style={styles.th}>Department</th>
+                  <th style={styles.th}>Position</th>
+                  <th style={styles.th}>Status</th>
+                  <th style={styles.th}>Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {staffList.data.map((u) => (
+                  <tr key={u.id} style={styles.tr}>
+                    <td style={styles.td}>{u.id}</td>
+                    <td style={styles.td}>{u.username}</td>
+                    <td style={styles.td}>{`${u.first_name} ${u.last_name}`}</td>
+                    <td style={styles.td}>{u.email}</td>
+                    <td style={styles.td}>{u.department?.name || 'N/A'}</td>
+                    <td style={styles.td}>{u.position?.name || 'N/A'}</td>
+                    <td style={styles.td}>
+                      <span style={{
+                        ...styles.statusBadge,
+                        backgroundColor: u.status === 'active' ? '#28a745' : u.status === 'inactive' ? '#ffc107' : '#dc3545'
+                      }}>
+                        {u.status}
+                      </span>
+                    </td>
+                    <td style={styles.td}>
+                      <button style={styles.editBtn} onClick={() => handleEditClick(u)}>
+                        Edit
+                      </button>
+                      <button style={styles.deleteBtn} onClick={() => handleDelete(u.id, u.role)}>
+                        Delete
+                      </button>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          )}
+          <div style={{ marginTop: '20px', textAlign: 'center' }}>
+            <button onClick={handlePrev} disabled={staffList.current_page === 1} style={{
+              ...styles.navBtn,
+              opacity: staffList.current_page === 1 ? 0.5 : 1,
+              cursor: staffList.current_page === 1 ? 'not-allowed' : 'pointer'
+            }}>
+              Previous
+            </button>
+            <span style={{ margin: '0 10px' }}>
+              Page {staffList.current_page || 1} of {staffList.last_page || 1}
+            </span>
+            <button onClick={handleNext} disabled={staffList.current_page === staffList.last_page} style={{
+              ...styles.navBtn,
+              opacity: staffList.current_page === staffList.last_page ? 0.5 : 1,
+              cursor: staffList.current_page === staffList.last_page ? 'not-allowed' : 'pointer'
+            }}>
+              Next
+            </button>
+          </div>
+        </>
+      )}
 
       {showModal && editingUser && (
         <div style={styles.modalOverlay} onClick={(e) => e.target === e.currentTarget && handleCloseModal()}>

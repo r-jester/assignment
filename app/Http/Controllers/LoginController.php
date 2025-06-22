@@ -11,10 +11,13 @@ class LoginController extends Controller
     {
         // Rate-limiting
         $key = 'login-attempt:' . $request->ip();
+
         if (RateLimiter::tooManyAttempts($key, 5)) {
             $seconds = RateLimiter::availableIn($key);
-            return redirect()->route('login')->withErrors([
-                'login' => "Too many attempts. Try again in $seconds seconds.",
+        
+            return redirect()->route('login')->with([
+                'too_many_attempts' => true,
+                'seconds_remaining' => $seconds,
             ]);
         }
 
